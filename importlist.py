@@ -181,5 +181,6 @@ weather_colors = {
     "overcast": discord.Color.greyple()
 }
 
-
+if __name__ == "__main__":
+    run()
         
