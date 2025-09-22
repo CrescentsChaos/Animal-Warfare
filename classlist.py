@@ -1,8 +1,7 @@
 class Location:
-    def __init__(self, biome, terrain , weather, time, disaster, loot,image):
+    def __init__(self, biome, terrain , time, disaster, loot,image):
         self.biome = biome
         self.terrain = terrain
-        self.weather = weather
         self.time = time
         self.disaster = disaster
         self.loot = loot

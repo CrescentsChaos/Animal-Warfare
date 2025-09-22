@@ -1,0 +1,189 @@
+{
+  "Savanna": {
+    "current": "thunderstorm",
+    "probabilities": {
+      "sunny": 0.6,
+      "overcast": 0.2,
+      "thunderstorm": 0.15,
+      "duststorm": 0.05
+    }
+  },
+  "Rainforest": {
+    "current": "rain",
+    "probabilities": {
+      "rain": 0.5,
+      "storm": 0.3,
+      "sunny": 0.1,
+      "fog": 0.1
+    }
+  },
+  "Desert": {
+    "current": "sunny",
+    "probabilities": {
+      "sunny": 0.7,
+      "sandstorm": 0.2,
+      "cool_night": 0.1
+    }
+  },
+  "Tundra": {
+    "current": "blizzard",
+    "probabilities": {
+      "snow": 0.4,
+      "blizzard": 0.3,
+      "clear": 0.2,
+      "fog": 0.1
+    }
+  },
+  "Ocean": {
+    "current": "storm",
+    "probabilities": {
+      "clear": 0.4,
+      "rain": 0.3,
+      "storm": 0.2,
+      "fog": 0.1
+    }
+  },
+  "Mountain": {
+    "current": "fog",
+    "probabilities": {
+      "overcast": 0.4,
+      "snow": 0.25,
+      "clear": 0.2,
+      "fog": 0.15
+    }
+  },
+  "Swamp": {
+    "current": "rain",
+    "probabilities": {
+      "rain": 0.4,
+      "sunny": 0.3,
+      "fog": 0.2,
+      "storm": 0.1
+    }
+  },
+  "Taiga": {
+    "current": "fog",
+    "probabilities": {
+      "snow": 0.4,
+      "clear": 0.3,
+      "fog": 0.2,
+      "blizzard": 0.1
+    }
+  },
+  "Coastal": {
+    "current": "clear",
+    "probabilities": {
+      "clear": 0.4,
+      "rain": 0.3,
+      "storm": 0.2,
+      "fog": 0.1
+    }
+  },
+  "Volcanic": {
+    "current": "ashfall",
+    "probabilities": {
+      "clear": 0.3,
+      "ashfall": 0.3,
+      "smoke": 0.2,
+      "lava_glow": 0.2
+    }
+  },
+  "Cave": {
+    "current": "damp",
+    "probabilities": {
+      "damp": 0.4,
+      "dry": 0.3,
+      "dripping_water": 0.2,
+      "bats_flying": 0.1
+    }
+  },
+  "Urban": {
+    "current": "rain",
+    "probabilities": {
+      "clear": 0.3,
+      "rain": 0.3,
+      "overcast": 0.3,
+      "storm": 0.1
+    }
+  },
+  "Polar": {
+    "current": "fog",
+    "probabilities": {
+      "snow": 0.4,
+      "blizzard": 0.3,
+      "clear": 0.2,
+      "fog": 0.1
+    }
+  },
+  "Deep Sea": {
+    "current": "darkness",
+    "probabilities": {
+      "calm": 0.5,
+      "currents": 0.3,
+      "darkness": 0.2
+    }
+  },
+  "Coral Reef": {
+    "current": "cloudy",
+    "probabilities": {
+      "clear": 0.5,
+      "rain": 0.2,
+      "storm": 0.2,
+      "cloudy": 0.1
+    }
+  },
+  "Kelp Forest": {
+    "current": "clear",
+    "probabilities": {
+      "clear": 0.4,
+      "fog": 0.3,
+      "rain": 0.2,
+      "storm": 0.1
+    }
+  },
+  "Mangrove": {
+    "current": "rain",
+    "probabilities": {
+      "rain": 0.4,
+      "clear": 0.3,
+      "storm": 0.2,
+      "fog": 0.1
+    }
+  },
+  "Frozen Ocean": {
+    "current": "snow",
+    "probabilities": {
+      "snow": 0.3,
+      "ice_winds": 0.3,
+      "blizzard": 0.2,
+      "clear": 0.2
+    }
+  },
+  "River": {
+    "current": "rain",
+    "probabilities": {
+      "clear": 0.4,
+      "rain": 0.3,
+      "storm": 0.2,
+      "fog": 0.1
+    }
+  },
+  "Lake": {
+    "current": "rain",
+    "probabilities": {
+      "clear": 0.4,
+      "rain": 0.3,
+      "fog": 0.2,
+      "storm": 0.1
+    }
+  },
+  "Jungle": {
+    "current": "sunny",
+    "probabilities": {
+      "rain": 0.4,
+      "storm": 0.3,
+      "sunny": 0.2,
+      "fog": 0.1
+    }
+  }
+}

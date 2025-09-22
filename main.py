@@ -87,26 +87,26 @@ async def profile(ctx: discord.Interaction):
         embed.add_field(name="Badges", value=badges, inline=False)
 
         await ctx.response.send_message(embed=embed)
-async def choose_weather(weather_str):
-    """
-    Choose a weather randomly based on weights defined in a string.
-    Example: "rain50,sunny50"
-    """
-    options = weather_str.split(",")
-    weighted_list = []
+        
+def get_weather(biome: str) -> str:
+    # open the weather.json file (where all biome weather is stored)
+    with open(WEATHER_FILE, "r") as f:
+        data = json.load(f)   # load JSON into a Python dict
 
-    for option in options:
-        # Split name and weight
-        name = ''.join(filter(str.isalpha, option))        # e.g. "rain"
-        weight = int(''.join(filter(str.isdigit, option))) # e.g. 50
+    # return the "current" weather value for the biome you asked for
+    return data[biome]["current"]
 
-        # Extend weighted list
-        weighted_list.extend([name] * weight)
-
-    if not weighted_list:
-        return None
-
-    return random.choice(weighted_list)
+@bot.tree.command(name="weather", description="Check the weather in a biome")
+async def weather_command(interaction: discord.Interaction, biome: str=None):
+    if biome is None:
+        async with aiosqlite.connect("playerdata.db") as db:
+            async with db.execute(f"SELECT location FROM '{interaction.user.id}'") as cursor:
+                loc_row = await cursor.fetchone()
+                biome = loc_row[0]
+                current = get_weather(biome.title())
+    else:            
+        current = get_weather(biome.title())
+    await interaction.response.send_message(f"The weather in {biome} is **{current}**.")
 
 async def get_location(loc):
     """Selects a random location from the earth.db database."""
@@ -115,15 +115,13 @@ async def get_location(loc):
             async with db.execute("SELECT * FROM biomes where name==?",(loc,)) as cursor:
                 row = await cursor.fetchone()
                 if row:
-                    wtr=await choose_weather(row[2])
                     location = Location(
                         biome=row[0],
                         terrain=row[1],
-                        weather=wtr,
                         time=None,       # leave as None if not in DB
                         disaster=None,   # leave as None if not in DB
-                        loot=row[3],      # maybe convert string to list if needed
-                        image=row[4]     # image URL or path
+                        loot=row[2],      # maybe convert string to list if needed
+                        image=row[3]     # image URL or path
                     )
                     return location
         return None
@@ -294,7 +292,7 @@ async def encounter(interaction: discord.Interaction):
     clr=int(clr, 16)
     embed = discord.Embed(
         title=f"A {(spawned_animal.name).title()} Appeared!",
-        description=f"You were searching in {location.biome} area! The weather is {location.weather}.",
+        description=f"You were searching in {location.biome} area!",
         color=clr
     )
 
