@@ -93,4 +93,90 @@ async def on_ready():
         print(f"Synced {len(synced)} command(s)!")
     except:
         print(Exception)
+
+weathernotifications = {
+  "clear": "The sky is clear and calm.",
+  "rain": "It is raining steadily.",
+  "thunderstorm": "A thunderstorm rages with lightning and thunder.",
+  "drought": "A severe drought is affecting the area.",
+  "flooding": "Rising water is flooding the surroundings!",
+  "sandstorm": "A sandstorm is blowing fiercely across the desert.",
+  "haboob": "A massive dust wall, called a haboob, sweeps the desert.",
+  "snow": "Snowflakes are falling gently from the sky.",
+  "blizzard": "A blizzard is raging, reducing visibility and making travel dangerous.",
+  "fog": "Thick fog reduces visibility.",
+  "hurricane": "A hurricane is battering the region with strong winds and rain.",
+  "typhoon": "A typhoon is approaching, bringing severe winds and rain.",
+  "tsunami": "A massive tsunami is approaching from the sea!",
+  "avalanche": "An avalanche rushes down the mountain slope!",
+  "lava_glow": "Lava glows intensely from volcanic activity.",
+  "eruption": "The volcano is erupting violently!",
+  "ashfall": "Volcanic ash is falling from the sky.",
+  "smoke": "Smoke from volcanic activity fills the air.",
+  "calm": "The deep sea is calm and still.",
+  "darkness": "The deep sea is dark and eerie.",
+  "damp": "The cave is damp and cool.",
+  "dry": "The cave is dry and quiet.",
+  "icequake": "The ice shifts violently, causing tremors in the frozen ocean.",
+  "overcast": "The sky is overcast with clouds."
+}
+
+weather_emojis = {
+    "clear": "☀️",
+    "rain": "🌧️",
+    "thunderstorm": "⛈️",
+    "drought": "🔥",
+    "flooding": "🌊",
+    "sandstorm": "🌪️",
+    "haboob": "💨",
+    "snow": "❄️",
+    "blizzard": "🌨️",
+    "fog": "🌫️",
+    "hurricane": "🌀",
+    "typhoon": "🌀",
+    "tsunami": "🌊",
+    "avalanche": "🏔️",
+    "lava_glow": "🌋",
+    "eruption": "🌋",
+    "ashfall": "🌋",
+    "smoke": "💨",
+    "calm": "🌊",
+    "currents": "🌊",
+    "darkness": "🌑",
+    "damp": "💧",
+    "dry": "🌵",
+    "icequake": "🧊",
+    "overcast": "☁️"
+}
+
+# Optional: map colors to weather types
+weather_colors = {
+    "clear": discord.Color.blue(),
+    "rain": discord.Color.dark_blue(),
+    "thunderstorm": discord.Color.dark_purple(),
+    "drought": discord.Color.orange(),
+    "flooding": discord.Color.teal(),
+    "sandstorm": discord.Color.gold(),
+    "haboob": discord.Color.dark_gold(),
+    "snow": discord.Color.light_grey(),
+    "blizzard": discord.Color.greyple(),
+    "fog": discord.Color.light_grey(),
+    "hurricane": discord.Color.dark_teal(),
+    "typhoon": discord.Color.dark_teal(),
+    "tsunami": discord.Color.teal(),
+    "avalanche": discord.Color.greyple(),
+    "lava_glow": discord.Color.red(),
+    "eruption": discord.Color.red(),
+    "ashfall": discord.Color.dark_grey(),
+    "smoke": discord.Color.dark_grey(),
+    "calm": discord.Color.blue(),
+    "currents": discord.Color.dark_blue(),
+    "darkness": discord.Color.dark_grey(),
+    "damp": discord.Color.teal(),
+    "dry": discord.Color.gold(),
+    "icequake": discord.Color.light_grey(),
+    "overcast": discord.Color.greyple()
+}
+
+
         

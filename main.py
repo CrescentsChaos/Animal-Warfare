@@ -106,7 +106,17 @@ async def weather_command(interaction: discord.Interaction, biome: str=None):
                 current = get_weather(biome.title())
     else:            
         current = get_weather(biome.title())
-    await interaction.response.send_message(f"The weather in {biome} is **{current}**.")
+    emoji = weather_emojis.get(current, "")
+    color = weather_colors.get(current, discord.Color.blue())
+
+    # Build the embed
+    weather = discord.Embed(
+        title=f"Weather update in {biome.title()}",
+        description=f"{emoji} **Current Weather:** **{current.title()}**\n\n{weathernotifications.get(current, '')}",
+        color=color
+    )
+    weather.set_footer(text="Weather changes every 3 hours.")
+    await interaction.response.send_message(embed=weather)
 
 async def get_location(loc):
     """Selects a random location from the earth.db database."""
@@ -335,8 +345,8 @@ async def setlocation(interaction: discord.Interaction, location: str):
         description=f"Enjoy your adventure!",
         color=discord.Color.green()
     )
-    if loc_row[4]:  # biome image
-        embed.set_image(url=loc_row[4])
+    if loc_row[3]:  # biome image
+        embed.set_image(url=loc_row[3])
 
     embed.set_footer(text="Explore and encounter creatures here!")
 
