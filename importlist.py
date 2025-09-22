@@ -1,8 +1,8 @@
 import os
-import discord
 from discord.ext import commands
 from discord import File
 from discord import app_commands
+from discord.ui import Button, View
 import aiosqlite
 import random
 import datetime
@@ -12,12 +12,12 @@ import os
 import sys
 import random
 import asyncio
-import math
 import datetime
 import json
 from flask import Flask
 from threading import Thread
 from dotenv import load_dotenv
+from classlist import *
 
 sys.stdout.reconfigure(encoding="utf-8")
 

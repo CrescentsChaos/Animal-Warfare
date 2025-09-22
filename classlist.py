@@ -1,3 +1,6 @@
+import discord
+import math
+
 class Location:
     def __init__(self, biome, terrain , time, disaster, loot,image):
         self.biome = biome
@@ -28,3 +31,73 @@ class Player:
         self.name = name
         self.location = location
         self.inventory = inventory
+
+class EncounterPaginator(discord.ui.View):
+    def __init__(self, interaction, animals, page_size=10):
+        super().__init__(timeout=300)
+        self.interaction = interaction
+        self.animals = animals
+        self.page_size = page_size
+        self.current_page = 0
+        self.max_page = math.ceil(len(animals) / page_size) - 1
+
+        # Disable prev button on first page
+        self.prev_button.disabled = self.current_page == 0
+        self.next_button.disabled = self.current_page == self.max_page
+
+    async def update_embed(self):
+        start = self.current_page * self.page_size
+        end = start + self.page_size
+        embed = discord.Embed(
+            title=f"Possible Encounters (Page {self.current_page+1}/{self.max_page+1})",
+            color=discord.Color.orange()
+        )
+        for animal in self.animals[start:end]:
+            embed.add_field(
+                name=f"{animal.name} ({animal.rarity})",
+                value=f"Ability: {animal.ability}",
+                inline=False
+            )
+        await self.message.edit(embed=embed, view=self)
+
+    @discord.ui.button(label="⬅️ Prev", style=discord.ButtonStyle.secondary)
+    async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.current_page > 0:
+            self.current_page -= 1
+            self.prev_button.disabled = self.current_page == 0
+            self.next_button.disabled = False
+
+            start = self.current_page * self.page_size
+            end = start + self.page_size
+            embed = discord.Embed(
+                title=f"Possible Encounters (Page {self.current_page+1}/{self.max_page+1})",
+                color=discord.Color.orange()
+            )
+            for animal in self.animals[start:end]:
+                embed.add_field(
+                    name=f"{animal.name} ({animal.rarity})",
+                    value=f"Ability: {animal.ability}",
+                    inline=False
+                )
+            await interaction.response.edit_message(embed=embed, view=self)
+
+    @discord.ui.button(label="Next ➡️", style=discord.ButtonStyle.secondary)
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if self.current_page < self.max_page:
+            self.current_page += 1
+            self.next_button.disabled = self.current_page == self.max_page
+            self.prev_button.disabled = False
+
+            start = self.current_page * self.page_size
+            end = start + self.page_size
+            embed = discord.Embed(
+                title=f"Possible Encounters (Page {self.current_page+1}/{self.max_page+1})",
+                color=discord.Color.orange()
+            )
+            for animal in self.animals[start:end]:
+                embed.add_field(
+                    name=f"{animal.name} ({animal.rarity})",
+                    value=f"Ability: {animal.ability}",
+                    inline=False
+                )
+            await interaction.response.edit_message(embed=embed, view=self)
