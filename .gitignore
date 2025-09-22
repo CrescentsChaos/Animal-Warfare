@@ -1,3 +1,4 @@
 .env
 __pycache__/
-venvs
+owned.db
+playerdata.db

@@ -506,18 +506,25 @@ class AnimalInfoView(discord.ui.View):
         self.prev_button.disabled = self.index <= 0
         self.next_button.disabled = self.index >= len(self.animals) - 1
 
-    def get_embed(self):
+    async def get_embed(self):
         animal = self.animals[self.index]
+        spawned_animal=await fetch_animal(animal['name'])
+        mh=await calc_stat(spawned_animal.health,animal['healthp'])
+        ma=await calc_stat(spawned_animal.attack,animal['attackp'])
+        md=await calc_stat(spawned_animal.defense,animal['defensep'])
+        ms=await calc_stat(spawned_animal.speed,animal['speedp'])
+        print(animal)
+        moves = json.loads(animal['moves'])
         embed = discord.Embed(
             title=f"📖 Animal Info ({self.index+1}/{len(self.animals)})",
             description=f"**Name:** {animal['name']}\n"
                         f"**Nickname:** {animal['nickname']}\n"
                         f"**Nature:** {animal['nature']}\n"
-                        f"**HP:** {animal['healthp']}\n"
-                        f"**Attack:** {animal['attackp']}\n"
-                        f"**Defense:** {animal['defensep']}\n"
-                        f"**Speed:** {animal['speedp']}\n"
-                        f"**Moves:** {animal['moves']}\n"
+                        f"**HP:** {mh}\n"
+                        f"**Attack:** {ma}\n"
+                        f"**Defense:** {md}\n"
+                        f"**Speed:** {ms}\n"
+                        f"**Moves:** {', '.join(moves)}\n"
                         f"**Training:** {animal['training']}",
             color=discord.Color.green()
         )
@@ -529,13 +536,13 @@ class AnimalInfoView(discord.ui.View):
     async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.index -= 1
         self.update_buttons()
-        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await interaction.response.edit_message(embed=await self.get_embed(), view=self)
 
     @discord.ui.button(label="Next ➡", style=discord.ButtonStyle.secondary)
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.index += 1
         self.update_buttons()
-        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+        await interaction.response.edit_message(embed=await self.get_embed(), view=self)
 
 
 # Slash command version
@@ -575,7 +582,81 @@ async def animals(interaction: discord.Interaction, index: int = 1):  # default 
     start_index = max(0, min(index - 1, len(animals) - 1))
 
     view = AnimalInfoView(animals, start_index=start_index)
-    await interaction.response.send_message(embed=view.get_embed(), view=view) 
-                        
+    await interaction.response.send_message(embed=await view.get_embed(), view=view) 
+    
+class AnimalsListView(View):
+    def __init__(self, animals, user_id, page=0, per_page=10):
+        super().__init__(timeout=60)
+        self.animals = animals
+        self.user_id = user_id  # restrict buttons to the user
+        self.page = page
+        self.per_page = per_page
+        self.update_buttons()
+
+    def update_buttons(self):
+        # Clear old buttons
+        self.clear_items()
+        # Add Previous button if not first page
+        if self.page > 0:
+            prev_button = Button(label="⬅ Previous", style=discord.ButtonStyle.secondary, custom_id="prev")
+            prev_button.callback = self.button_callback
+            self.add_item(prev_button)
+        # Add Next button if not last page
+        if (self.page + 1) * self.per_page < len(self.animals):
+            next_button = Button(label="Next ➡", style=discord.ButtonStyle.secondary, custom_id="next")
+            next_button.callback = self.button_callback
+            self.add_item(next_button)
+
+    def get_embed(self):
+        start = self.page * self.per_page
+        end = start + self.per_page
+        page_animals = self.animals[start:end]
+
+        description = ""
+        for i, animal in enumerate(page_animals, start=start + 1):
+            description += f"**{i}. {animal['name']}** (Nickname: {animal['nickname']})\n"
+
+        total_pages = (len(self.animals) - 1) // self.per_page + 1
+        embed = discord.Embed(
+            title=f"📜 Captured Animals (Page {self.page + 1}/{total_pages})",
+            description=description,
+            color=discord.Color.green()
+        )
+        return embed
+
+    async def button_callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ You cannot control this.", ephemeral=True)
+            return
+
+        if interaction.data["custom_id"] == "next":
+            self.page += 1
+        elif interaction.data["custom_id"] == "prev":
+            self.page -= 1
+
+        self.update_buttons()
+        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+
+# Slash command with optional page parameter
+@bot.tree.command(name="animals_list", description="View your captured animals list (10 per page)")
+@app_commands.describe(page="Optional: page number to jump to")
+async def animals_list(interaction: discord.Interaction, page: int = 1):
+    table_name = str(interaction.user.id)
+
+    async with aiosqlite.connect("owned.db") as db:
+        cursor = await db.execute(f"SELECT name, nickname FROM [{table_name}]")
+        rows = await cursor.fetchall()
+
+    if not rows:
+        await interaction.response.send_message("❌ You don’t own any animals yet!", ephemeral=True)
+        return
+
+    animals = [{"name": row[0], "nickname": row[1]} for row in rows]
+
+    total_pages = (len(animals) - 1) // 10 + 1
+    page = max(1, min(page, total_pages))  # clamp page number
+    view = AnimalsListView(animals, interaction.user.id, page=page-1)
+    await interaction.response.send_message(embed=view.get_embed(), view=view)
+                    
 keep_alive()
 bot.run(token)  

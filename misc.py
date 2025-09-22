@@ -207,7 +207,30 @@ async def convert_wildanimal(animal):
                     speed=await calc_stat(animal.speed,animal.speedp)
                 )
                 return battle_animal
-        
+async def fetch_animal(name):
+    async with aiosqlite.connect("Organisms.db") as db:
+        cursor = await db.execute("SELECT * FROM Animals where name==?",(name,))
+        row = await cursor.fetchone()
+
+    animal = Animal(
+            name=row[0],
+            scientific_name=row[1],
+            habitat=row[2],
+            drops=row[3],
+            attack=row[4],
+            defense=row[5],
+            health=row[6],
+            speed=row[7],
+            ability=row[8],
+            catagory=row[9],
+            moves=row[10],
+            sprite=row[11],
+            rarity=row[12],
+            description=row[13],
+            nature=random.choice(["Brave","Calm","Timid","Jolly","Modest","Bold","Hasty","Quiet","Sassy","Adamant"])
+        )
+
+    return animal        
 async def battle(ally,foe,battle_type):
     if battle_type=="wild":
         foe=await convert_wildanimal(foe)

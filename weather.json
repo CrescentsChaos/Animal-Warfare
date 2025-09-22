@@ -1,6 +1,6 @@
 {
   "Savanna": {
-    "current": "clear",
+    "current": "rain",
     "probabilities": {
       "clear": 0.6,
       "rain": 0.2,
@@ -9,7 +9,7 @@
     }
   },
   "Rainforest": {
-    "current": "rain",
+    "current": "thunderstorm",
     "probabilities": {
       "rain": 0.55,
       "flooding": 0.05,
@@ -19,7 +19,7 @@
     }
   },
   "Desert": {
-    "current": "haboob",
+    "current": "drought",
     "probabilities": {
       "clear": 0.2,
       "drought": 0.5,
@@ -28,7 +28,7 @@
     }
   },
   "Tundra": {
-    "current": "blizzard",
+    "current": "snow",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.3,
@@ -37,7 +37,7 @@
     }
   },
   "Ocean": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.45,
       "rain": 0.25,
@@ -57,7 +57,7 @@
     }
   },
   "Swamp": {
-    "current": "rain",
+    "current": "fog",
     "probabilities": {
       "rain": 0.45,
       "clear": 0.25,
@@ -67,7 +67,7 @@
     }
   },
   "Taiga": {
-    "current": "blizzard",
+    "current": "fog",
     "probabilities": {
       "snow": 0.5,
       "clear": 0.25,
@@ -88,7 +88,7 @@
     }
   },
   "Volcanic": {
-    "current": "lava_glow",
+    "current": "smoke",
     "probabilities": {
       "clear": 0.3,
       "ashfall": 0.3,
@@ -98,7 +98,7 @@
     }
   },
   "Cave": {
-    "current": "damp",
+    "current": "flooding",
     "probabilities": {
       "damp": 0.5,
       "dry": 0.4,
@@ -106,7 +106,7 @@
     }
   },
   "Urban": {
-    "current": "overcast",
+    "current": "rain",
     "probabilities": {
       "clear": 0.35,
       "rain": 0.3,
@@ -116,7 +116,7 @@
     }
   },
   "Polar": {
-    "current": "snow",
+    "current": "fog",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.35,
@@ -125,7 +125,7 @@
     }
   },
   "Deep Sea": {
-    "current": "darkness",
+    "current": "calm",
     "probabilities": {
       "calm": 0.5,
       "currents": 0.3,
@@ -145,7 +145,7 @@
     }
   },
   "Kelp Forest": {
-    "current": "clear",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.45,
       "rain": 0.3,
@@ -153,7 +153,7 @@
     }
   },
   "Mangrove": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.3,
       "rain": 0.45,
@@ -174,7 +174,7 @@
     }
   },
   "River": {
-    "current": "fog",
+    "current": "clear",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -184,7 +184,7 @@
     }
   },
   "Lake": {
-    "current": "flooding",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
