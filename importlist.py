@@ -17,7 +17,9 @@ import json
 from flask import Flask
 from threading import Thread
 from dotenv import load_dotenv
+from waitress import serve
 from classlist import *
+
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -25,7 +27,7 @@ load_dotenv()
 token=os.getenv("TOKEN")
 intents = discord.Intents.default()
 # Only turn on what you actually need:
-intents.message_content = False   # True only if you read normal messages
+intents.message_content = True   # True only if you read normal messages
 intents.members = False           # True only if you access member lists
 intents.presences = False
 
@@ -37,7 +39,7 @@ def home():
     return "Hello. I am alive!"
 
 def run():
-  app.run(host='0.0.0.0',port=8080)
+  serve(app, host='0.0.0.0', port=8080)
 
 def keep_alive():
     t = Thread(target=run)

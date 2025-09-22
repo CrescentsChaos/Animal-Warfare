@@ -1,6 +1,6 @@
 {
   "Savanna": {
-    "current": "clear",
+    "current": "drought",
     "probabilities": {
       "clear": 0.6,
       "rain": 0.2,
@@ -19,7 +19,7 @@
     }
   },
   "Desert": {
-    "current": "clear",
+    "current": "drought",
     "probabilities": {
       "clear": 0.2,
       "drought": 0.5,
@@ -28,7 +28,7 @@
     }
   },
   "Tundra": {
-    "current": "snow",
+    "current": "blizzard",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.3,
@@ -37,7 +37,7 @@
     }
   },
   "Ocean": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.45,
       "rain": 0.25,
@@ -57,7 +57,7 @@
     }
   },
   "Swamp": {
-    "current": "fog",
+    "current": "rain",
     "probabilities": {
       "rain": 0.45,
       "clear": 0.25,
@@ -88,7 +88,7 @@
     }
   },
   "Volcanic": {
-    "current": "clear",
+    "current": "eruption",
     "probabilities": {
       "clear": 0.3,
       "ashfall": 0.3,
@@ -116,7 +116,7 @@
     }
   },
   "Polar": {
-    "current": "blizzard",
+    "current": "snow",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.35,
@@ -125,7 +125,7 @@
     }
   },
   "Deep Sea": {
-    "current": "calm",
+    "current": "darkness",
     "probabilities": {
       "calm": 0.5,
       "currents": 0.3,
@@ -133,7 +133,7 @@
     }
   },
   "Coral Reef": {
-    "current": "clear",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.5,
       "rain": 0.25,
@@ -153,7 +153,7 @@
     }
   },
   "Mangrove": {
-    "current": "clear",
+    "current": "rain",
     "probabilities": {
       "clear": 0.3,
       "rain": 0.45,
@@ -165,7 +165,7 @@
     }
   },
   "Frozen Ocean": {
-    "current": "snow",
+    "current": "blizzard",
     "probabilities": {
       "snow": 0.3,
       "icequake": 0.1,
@@ -194,7 +194,7 @@
     }
   },
   "Jungle": {
-    "current": "flooding",
+    "current": "rain",
     "probabilities": {
       "rain": 0.4,
       "thunderstorm": 0.3,
