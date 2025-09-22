@@ -1,6 +1,6 @@
 {
   "Savanna": {
-    "current": "drought",
+    "current": "clear",
     "probabilities": {
       "clear": 0.6,
       "rain": 0.2,
@@ -19,7 +19,7 @@
     }
   },
   "Desert": {
-    "current": "drought",
+    "current": "haboob",
     "probabilities": {
       "clear": 0.2,
       "drought": 0.5,
@@ -37,7 +37,7 @@
     }
   },
   "Ocean": {
-    "current": "clear",
+    "current": "rain",
     "probabilities": {
       "clear": 0.45,
       "rain": 0.25,
@@ -67,7 +67,7 @@
     }
   },
   "Taiga": {
-    "current": "snow",
+    "current": "blizzard",
     "probabilities": {
       "snow": 0.5,
       "clear": 0.25,
@@ -76,7 +76,7 @@
     }
   },
   "Coastal": {
-    "current": "rain",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -88,7 +88,7 @@
     }
   },
   "Volcanic": {
-    "current": "eruption",
+    "current": "lava_glow",
     "probabilities": {
       "clear": 0.3,
       "ashfall": 0.3,
@@ -98,7 +98,7 @@
     }
   },
   "Cave": {
-    "current": "dry",
+    "current": "damp",
     "probabilities": {
       "damp": 0.5,
       "dry": 0.4,
@@ -106,7 +106,7 @@
     }
   },
   "Urban": {
-    "current": "clear",
+    "current": "overcast",
     "probabilities": {
       "clear": 0.35,
       "rain": 0.3,
@@ -133,7 +133,7 @@
     }
   },
   "Coral Reef": {
-    "current": "thunderstorm",
+    "current": "clear",
     "probabilities": {
       "clear": 0.5,
       "rain": 0.25,
@@ -145,7 +145,7 @@
     }
   },
   "Kelp Forest": {
-    "current": "thunderstorm",
+    "current": "clear",
     "probabilities": {
       "clear": 0.45,
       "rain": 0.3,
@@ -165,7 +165,7 @@
     }
   },
   "Frozen Ocean": {
-    "current": "blizzard",
+    "current": "clear",
     "probabilities": {
       "snow": 0.3,
       "icequake": 0.1,
@@ -174,7 +174,7 @@
     }
   },
   "River": {
-    "current": "rain",
+    "current": "fog",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -184,7 +184,7 @@
     }
   },
   "Lake": {
-    "current": "clear",
+    "current": "flooding",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,

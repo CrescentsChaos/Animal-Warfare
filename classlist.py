@@ -11,9 +11,10 @@ class Location:
         self.image = image
         
 class Animal:
-    def __init__(self, name, scientific_name, habitat,ability, health, attack, defense, speed, catagory, rarity, drops,sprite,description,moves):
+    def __init__(self, name, scientific_name, nature,habitat,ability, health, attack, defense, speed, catagory, rarity, drops,sprite,description,moves,healthp=0,attackp=0,defensep=0,speedp=0,training=0):
         self.name = name
         self.scientific_name = scientific_name
+        self.nature = nature
         self.habitat = habitat
         self.ability = ability
         self.health = health
@@ -26,11 +27,36 @@ class Animal:
         self.sprite = sprite
         self.description = description
         self.moves = moves
+        self.healthp = healthp
+        self.attackp = attackp
+        self.defensep = defensep
+        self.speedp = speedp
+        self.training = training
+        
+class BattleAnimal:
+    def __init__(self, name, ability, nature, moves, drop, health,attack,defense,speed):
+        self.name = name
+        self.ability = ability
+        self.moves = moves
+        self.nature = nature
+        self.status = "Alive"
+        self.drop = drop
+        self.health = health
+        self.attack = attack
+        self.defense = defense
+        self.speed = speed
+        self.flinch = False
+        self.confused = False
+        self.attackboost = 0
+        self.defenseboost = 0
+        self.speedboost = 0
+        
 class Player:
-    def __init__(self, name, location, inventory):
+    def __init__(self, name, location, inventory,idt):
         self.name = name
         self.location = location
         self.inventory = inventory
+        self.id = idt
 
 class EncounterPaginator(discord.ui.View):
     def __init__(self, interaction, animals, page_size=10):

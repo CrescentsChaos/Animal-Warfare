@@ -1,5 +1,112 @@
 from misc import *
 
+class StarterSelect(discord.ui.View):
+    def __init__(self, user_id):
+        super().__init__(timeout=60)  # 60 sec timeout
+        self.user_id = user_id
+
+    async def give_starter(self, interaction: discord.Interaction, starter):
+        # Insert chosen starter into owned.db
+        async with aiosqlite.connect("owned.db") as db:
+            await db.execute(f"""
+                CREATE TABLE IF NOT EXISTS [{self.user_id}] (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    nickname TEXT,
+                    sprite TEXT,
+                    nature TEXT,
+                    healthp INTEGER,
+                    attackp INTEGER,
+                    defensep INTEGER,
+                    speedp INTEGER,
+                    moves TEXT,
+                    training INTEGER
+                )
+            """)
+
+            await db.execute(f"""
+                INSERT INTO [{self.user_id}] 
+                (name, nickname, sprite, nature, healthp, attackp, defensep, speedp, moves, training)
+                VALUES (?, ?,?, ?, ?, ?, ?, ?, ?,?)
+            """, (
+                starter["name"],
+                starter["nickname"],
+                starter["sprite"],
+                starter["nature"],
+                starter["healthp"],
+                starter["attackp"],
+                starter["defensep"],
+                starter["speedp"],
+                starter["moves"],
+                starter["training"]
+            ))
+
+            await db.commit()
+
+        embed = discord.Embed(
+            title=f"🎉 You chose {starter['name']}!",
+            description=f"**Nature:** {starter['nature']}\nYour journey begins now!",
+            color=discord.Color.green()
+        )
+        embed.set_thumbnail(url=starter["sprite"])  # Small preview in corner
+        embed.set_image(url=starter["sprite"])      # Big full image
+        embed.set_footer(text="Your new companion has joined your adventure!")
+
+        await interaction.response.edit_message(
+            content=None,
+            embed=embed,
+            view=None
+        )
+
+    # --- Button callbacks ---
+    @discord.ui.button(label="Calico Cat", style=discord.ButtonStyle.primary)
+    async def calico(self, interaction: discord.Interaction, button: discord.ui.Button):
+        starter = {
+            "name": "Calico Cat",
+            "nickname": "Calico Cat",
+            "sprite": "https://i.postimg.cc/kgZHx9N0/calico.png",
+            "nature": "Playful",
+            "healthp": 0,
+            "attackp": 0,
+            "defensep": 0,
+            "speedp": 0,
+            "moves": json.dumps(["Scratch", "Pounce", "Quick Dash", "Tail Whip"]),
+            "training": 0
+        }
+        await self.give_starter(interaction, starter)
+
+    @discord.ui.button(label="Tuxedo Cat", style=discord.ButtonStyle.success)
+    async def tuxedo(self, interaction: discord.Interaction, button: discord.ui.Button):
+        starter = {
+            "name": "Tuxedo Cat",
+            "nickname": "Tuxedo Cat",
+            "sprite": "https://i.postimg.cc/8ztCG1zL/tuxedo.png",
+            "nature": "Curious",
+            "healthp": 0,
+            "attackp": 0,
+            "defensep": 0,
+            "speedp": 0,
+            "moves": json.dumps(["Scratch", "Pounce", "Sneaky Dash", "Tail Whip"]),
+            "training": 0
+        }
+        await self.give_starter(interaction, starter)
+
+    @discord.ui.button(label="Tabby Cat", style=discord.ButtonStyle.danger)
+    async def tabby(self, interaction: discord.Interaction, button: discord.ui.Button):
+        starter = {
+            "name": "Tabby Cat",
+            "nickname": "Tabby Cat",
+            "sprite": "https://i.postimg.cc/rmR3f9HK/tabby.png",
+            "nature": "Bold",
+            "healthp": 0,
+            "attackp": 0,
+            "defensep": 0,
+            "speedp": 0,
+            "moves": json.dumps(["Scratch", "Leap Strike", "Dark Pounce", "Tail Whip"]),
+            "training": 0
+        }
+        await self.give_starter(interaction, starter)
+        
 @bot.tree.command(name="start", description="Starts the game.")
 async def start(ctx: discord.Interaction):
     async with aiosqlite.connect("playerdata.db") as db:
@@ -44,7 +151,11 @@ async def start(ctx: discord.Interaction):
         """, (ca,))
         # Save changes
         await db.commit()
-        await ctx.response.send_message("✅ Account created successfully!")
+    view = StarterSelect(ctx.user.id)
+    await ctx.response.send_message(
+        "🎉 Account created! Choose your starter cat:",
+        view=view
+    )
 
 @bot.tree.command(name="profile", description="View your player stats.")
 async def profile(ctx: discord.Interaction):
@@ -161,7 +272,60 @@ async def anidex(interaction: discord.Interaction, name: str):
             await interaction.followup.send(embed=embed)
           
 
+class EncounterView(View):
+    def __init__(self, spawned_animal, player):
+        super().__init__(timeout=60)
+        self.spawned_animal = spawned_animal
+        self.player = player
 
+    @button(label="⚔️ Fight", style=discord.ButtonStyle.red)
+    async def fight_button(self, interaction: discord.Interaction, button: Button):
+        winner = await battle(self.player, self.spawned_animal,"wild")
+        if winner == self.player.id:
+            # After win → show Capture & Loot options
+            new_view = CaptureLootView(self.spawned_animal, self.player)
+            await interaction.response.edit_message(
+                embed=interaction.message.embeds[0],
+                content=f"⚔️ You defeated **{self.spawned_animal.name}**!\nWhat do you want to do?",
+                view=new_view
+            )
+        else:
+            await interaction.response.edit_message(
+                content=f"💀 You were defeated by **{self.spawned_animal.name}**...",
+                view=None
+            )
+
+    @button(label="🏃 Run", style=discord.ButtonStyle.gray)
+    async def run_button(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.edit_message(
+            content="🏃 You escaped safely!",
+            view=None
+        )
+
+
+class CaptureLootView(View):
+    def __init__(self, spawned_animal, player):
+        super().__init__(timeout=30)
+        self.spawned_animal = spawned_animal
+        self.player = player
+
+    @button(label="🎯 Capture", style=discord.ButtonStyle.green)
+    async def capture_button(self, interaction: discord.Interaction, button: Button):
+        await save_capture(self.player, self.spawned_animal)  # <-- DB save function
+        await interaction.response.edit_message(
+            content=f"🎉 You captured **{self.spawned_animal.name}**!",
+            view=None
+        )
+
+    @button(label="💰 Loot", style=discord.ButtonStyle.blurple)
+    async def loot_button(self, interaction: discord.Interaction, button: Button):
+        loot_item = random.choice(self.spawned_animal.drop.split(',')) # <-- generate item(s)
+        await add_to_inventory(self.player, loot_item)   # <-- save in DB
+        await interaction.response.edit_message(
+            content=f"💰 You looted **{loot_item}** from {self.spawned_animal.name}!",
+            view=None
+        )
+        
 @bot.tree.command(name="encounter", description="Starts a new wilderness encounter.")
 async def encounter(interaction: discord.Interaction):
     """A command to initiate a new encounter."""
@@ -187,7 +351,7 @@ async def encounter(interaction: discord.Interaction):
             return
 
         balance, health, deathcount, location_name, inventory, creationdate, winstreak, highstreak, badges = stats
-        p = Player(name=interaction.user.display_name, location=location_name, inventory=inventory)
+        p = Player(name=interaction.user.display_name, location=location_name, inventory=inventory,idt=interaction.user.id)
     # Get a random location (async)
     location = await get_location(p.location)
     if not location:
@@ -209,18 +373,27 @@ async def encounter(interaction: discord.Interaction):
     # Create an embed to display the encounter
     clr=await rarity_color(spawned_animal.rarity)
     clr=int(clr, 16)
+    spawned_animal.healthp=random.randint(-50,50)
+    spawned_animal.attackp=random.randint(-50,50)
+    spawned_animal.defensep=random.randint(-50,50)
+    spawned_animal.speedp=random.randint(-50,50)
+    mh=await calc_stat(spawned_animal.health,spawned_animal.healthp)
+    ma=await calc_stat(spawned_animal.attack,spawned_animal.attackp)
+    md=await calc_stat(spawned_animal.defense,spawned_animal.defensep)
+    ms=await calc_stat(spawned_animal.speed,spawned_animal.speedp)
     embed = discord.Embed(
-        title=f"A {(spawned_animal.name).title()} Appeared!",
-        description=f"You were searching in {location.biome} area!",
+        title=f"{(spawned_animal.name).title()} Appeared!",
+        description=f"You were searching in {location.biome}!",
         color=clr
     )
 
     embed.set_image(url=spawned_animal.sprite)
     embed.add_field(name="Scientific Name", value=f"*{spawned_animal.scientific_name}*", inline=True)
     embed.add_field(name="Description", value=spawned_animal.description, inline=False)
+    embed.add_field(name="Stats", value=f"HP: {mh}\nAttack: {ma}\nDefense: {md}\nSpeed: {ms}", inline=True)
     embed.set_footer(text=f"Location: {location_name} | Keep exploring!")
-
-    await interaction.followup.send(embed=embed)
+    view = EncounterView(spawned_animal, p)
+    await interaction.followup.send(embed=embed, view=view)
 
 @bot.tree.command(name="setlocation", description="Change your current location.")
 @app_commands.describe(location="Enter the name of the new location.")
@@ -321,7 +494,88 @@ async def spawnlist(interaction: discord.Interaction):
             inline=False
         )
     paginator.message = await interaction.followup.send(embed=embed, view=paginator)
-    
+
+class AnimalInfoView(discord.ui.View):
+    def __init__(self, animals, start_index=0):
+        super().__init__(timeout=60)
+        self.animals = animals
+        self.index = start_index
+        self.update_buttons()
+
+    def update_buttons(self):
+        self.prev_button.disabled = self.index <= 0
+        self.next_button.disabled = self.index >= len(self.animals) - 1
+
+    def get_embed(self):
+        animal = self.animals[self.index]
+        embed = discord.Embed(
+            title=f"📖 Animal Info ({self.index+1}/{len(self.animals)})",
+            description=f"**Name:** {animal['name']}\n"
+                        f"**Nickname:** {animal['nickname']}\n"
+                        f"**Nature:** {animal['nature']}\n"
+                        f"**HP:** {animal['healthp']}\n"
+                        f"**Attack:** {animal['attackp']}\n"
+                        f"**Defense:** {animal['defensep']}\n"
+                        f"**Speed:** {animal['speedp']}\n"
+                        f"**Moves:** {animal['moves']}\n"
+                        f"**Training:** {animal['training']}",
+            color=discord.Color.green()
+        )
+        if animal['sprite']:
+            embed.set_thumbnail(url=animal['sprite'])
+        return embed
+
+    @discord.ui.button(label="⬅ Previous", style=discord.ButtonStyle.secondary)
+    async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index -= 1
+        self.update_buttons()
+        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+
+    @discord.ui.button(label="Next ➡", style=discord.ButtonStyle.secondary)
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index += 1
+        self.update_buttons()
+        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+
+
+# Slash command version
+@bot.tree.command(name="animals", description="View your captured animals")
+@app_commands.describe(index="The number of the animal in your collection (optional)")
+async def animals(interaction: discord.Interaction, index: int = 1):  # default = 1 (first animal)
+    table_name = str(interaction.user.id)
+
+    async with aiosqlite.connect("owned.db") as db:
+        cursor = await db.execute(f"""
+            SELECT name, nickname, sprite, nature, healthp, attackp, defensep, speedp, moves, training
+            FROM [{table_name}]
+        """)
+        rows = await cursor.fetchall()
+
+    if not rows:
+        await interaction.response.send_message("❌ You don’t own any animals yet!", ephemeral=True)
+        return
+
+    animals = [
+        {
+            "name": row[0],
+            "nickname": row[1],
+            "sprite": row[2],
+            "nature": row[3],
+            "healthp": row[4],
+            "attackp": row[5],
+            "defensep": row[6],
+            "speedp": row[7],
+            "moves": row[8],
+            "training": row[9]
+        }
+        for row in rows
+    ]
+
+    # clamp index to valid range
+    start_index = max(0, min(index - 1, len(animals) - 1))
+
+    view = AnimalInfoView(animals, start_index=start_index)
+    await interaction.response.send_message(embed=view.get_embed(), view=view) 
                         
 keep_alive()
 bot.run(token)  

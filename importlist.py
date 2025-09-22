@@ -2,7 +2,7 @@ import os
 from discord.ext import commands
 from discord import File
 from discord import app_commands
-from discord.ui import Button, View
+from discord.ui import Button, View, button
 import aiosqlite
 import random
 import datetime
@@ -18,6 +18,7 @@ from flask import Flask
 from threading import Thread
 from dotenv import load_dotenv
 from waitress import serve
+from math import sqrt
 from classlist import *
 
 
