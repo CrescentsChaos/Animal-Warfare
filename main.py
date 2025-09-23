@@ -73,7 +73,7 @@ class StarterSelect(discord.ui.View):
             "attackp": 0,
             "defensep": 0,
             "speedp": 0,
-            "moves": json.dumps(["Scratch", "Pounce", "Quick Dash", "Tail Whip"]),
+            "moves": json.dumps(["Scratch", "Pounce", "Bite", "Tail Whip"]),
             "training": 0
         }
         await self.give_starter(interaction, starter)
@@ -90,7 +90,7 @@ class StarterSelect(discord.ui.View):
             "attackp": 0,
             "defensep": 0,
             "speedp": 0,
-            "moves": json.dumps(["Scratch", "Pounce", "Sneaky Dash", "Tail Whip"]),
+            "moves": json.dumps(["Scratch", "Pounce", "Bite", "Tail Whip"]),
             "training": 0
         }
         await self.give_starter(interaction, starter)
@@ -107,7 +107,7 @@ class StarterSelect(discord.ui.View):
             "attackp": 0,
             "defensep": 0,
             "speedp": 0,
-            "moves": json.dumps(["Scratch", "Leap Strike", "Dark Pounce", "Tail Whip"]),
+            "moves": json.dumps(["Scratch", "Pounce", "Bite", "Tail Whip"]),
             "training": 0
         }
         await self.give_starter(interaction, starter)
