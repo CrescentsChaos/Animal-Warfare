@@ -11,7 +11,7 @@ class Location:
         self.image = image
         
 class Animal:
-    def __init__(self, name, scientific_name, nature,habitat,ability, health, attack, defense, speed, catagory, rarity, drops,sprite,description,moves,healthp=0,attackp=0,defensep=0,speedp=0,training=0):
+    def __init__(self, name, scientific_name, nature,habitat,ability, health, attack, defense, speed, category, rarity, drops,sprite,description,moves,healthp=0,attackp=0,defensep=0,speedp=0,training=0):
         self.name = name
         self.scientific_name = scientific_name
         self.nature = nature
@@ -21,7 +21,7 @@ class Animal:
         self.attack = attack
         self.defense = defense
         self.speed = speed
-        self.catagory = catagory
+        self.category = category
         self.rarity = rarity
         self.drops = drops
         self.sprite = sprite
@@ -34,10 +34,10 @@ class Animal:
         self.training = training
         
 class BattleAnimal:
-    def __init__(self, name, sprite,catagory, ability, nature, moves, drop, health,attack,defense,speed):
+    def __init__(self, name, sprite,category, ability, nature, moves, drop, health,attack,defense,speed):
         self.name = name
         self.sprite = sprite
-        self.catagory = catagory
+        self.category = category
         self.ability = ability
         self.moves = moves
         self.nature = nature

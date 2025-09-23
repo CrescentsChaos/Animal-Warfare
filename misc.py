@@ -83,7 +83,7 @@ async def get_animals_by_biome(biome):
                         defense=row[5],
                         speed=row[7],
                         rarity=row[12],
-                        catagory=row[9],
+                        category=row[9],
                         drops=row[3],
                         sprite=row[11],
                         description=row[13],
@@ -218,7 +218,7 @@ async def convert_allyanimal(user_id: int) -> BattleAnimal | None:
         moves = json.loads(moves_json)
     async with aiosqlite.connect("Organisms.db") as db:
         cursor = await db.execute(f"""
-            SELECT health, attack, defense, speed, catagory
+            SELECT health, attack, defense, speed, category
             FROM Animals
             WHERE name = ?
         """, (name,))
@@ -229,7 +229,7 @@ async def convert_allyanimal(user_id: int) -> BattleAnimal | None:
         name=name,
         sprite=sprite,  # You can customize later
         ability=ability,
-        catagory=animalstat[4],  # You can customize later
+        category=animalstat[4],  # You can customize later
         nature=nature,
         moves=moves,
         drop=None,   # You can customize later
@@ -251,7 +251,7 @@ async def convert_wildanimal(animal):
                     name=animal.name,
                     sprite=animal.sprite,
                     ability=animal.ability,
-                    catagory=animal.catagory,
+                    category=animal.category,
                     nature=random.choice(naturelist),
                     moves=await get_moves(row[10].split(",")),
                     drop=random.choice(animal.drops.split(",")),
@@ -313,7 +313,7 @@ async def fetch_animal(name):
             health=row[6],
             speed=row[7],
             ability=row[8],
-            catagory=row[9],
+            category=row[9],
             moves=row[10],
             sprite=row[11],
             rarity=row[12],
@@ -362,9 +362,12 @@ async def attack(attacker,defender,move,player,foe,field,embed):
         "Scratch" : scratch,
         "Bite" : bite,
         "Peck" : peck,
+        "Pounce" : pounce,
+        "Tail Whip" : tailwhip
     }
     if move in attacks:
         await attacks[move](attacker,defender,move,player,foe,field,embed)
         
+      
     
     

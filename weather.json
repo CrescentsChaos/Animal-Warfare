@@ -9,7 +9,7 @@
     }
   },
   "Rainforest": {
-    "current": "rain",
+    "current": "thunderstorm",
     "probabilities": {
       "rain": 0.55,
       "flooding": 0.05,
@@ -28,7 +28,7 @@
     }
   },
   "Tundra": {
-    "current": "clear",
+    "current": "blizzard",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.3,
@@ -47,7 +47,7 @@
     }
   },
   "Mountain": {
-    "current": "clear",
+    "current": "overcast",
     "probabilities": {
       "overcast": 0.3,
       "snow": 0.2,
@@ -57,7 +57,7 @@
     }
   },
   "Swamp": {
-    "current": "clear",
+    "current": "rain",
     "probabilities": {
       "rain": 0.45,
       "clear": 0.25,
@@ -67,7 +67,7 @@
     }
   },
   "Taiga": {
-    "current": "clear",
+    "current": "snow",
     "probabilities": {
       "snow": 0.5,
       "clear": 0.25,
@@ -76,7 +76,7 @@
     }
   },
   "Coastal": {
-    "current": "thunderstorm",
+    "current": "clear",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -88,7 +88,7 @@
     }
   },
   "Volcano": {
-    "current": "ashfall",
+    "current": "clear",
     "probabilities": {
       "clear": 0.3,
       "ashfall": 0.3,
@@ -98,7 +98,7 @@
     }
   },
   "Cave": {
-    "current": "damp",
+    "current": "dry",
     "probabilities": {
       "damp": 0.5,
       "dry": 0.4,
@@ -106,7 +106,7 @@
     }
   },
   "Urban": {
-    "current": "flooding",
+    "current": "rain",
     "probabilities": {
       "clear": 0.35,
       "rain": 0.3,
@@ -125,7 +125,7 @@
     }
   },
   "Deep Sea": {
-    "current": "calm",
+    "current": "currents",
     "probabilities": {
       "calm": 0.5,
       "currents": 0.3,
@@ -133,7 +133,7 @@
     }
   },
   "Coral Reef": {
-    "current": "thunderstorm",
+    "current": "clear",
     "probabilities": {
       "clear": 0.5,
       "rain": 0.25,
@@ -153,7 +153,7 @@
     }
   },
   "Mangrove": {
-    "current": "rain",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.3,
       "rain": 0.45,
@@ -165,7 +165,7 @@
     }
   },
   "Frozen Ocean": {
-    "current": "snow",
+    "current": "clear",
     "probabilities": {
       "snow": 0.3,
       "icequake": 0.1,
@@ -174,7 +174,7 @@
     }
   },
   "River": {
-    "current": "clear",
+    "current": "rain",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -184,7 +184,7 @@
     }
   },
   "Lake": {
-    "current": "clear",
+    "current": "flooding",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,

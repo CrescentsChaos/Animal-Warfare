@@ -250,7 +250,7 @@ async def anidex(interaction: discord.Interaction, name: str):
                 defense=row[5],
                 speed=row[7],
                 rarity=row[12],
-                catagory=row[9],
+                category=row[9],
                 drops=row[3],
                 sprite=row[11],
                 description=row[13],
@@ -265,7 +265,7 @@ async def anidex(interaction: discord.Interaction, name: str):
                 color=clr
             )
             embed.add_field(name="Habitat:", value=animal.habitat, inline=True)
-            embed.add_field(name="Category:", value=animal.catagory, inline=True)
+            embed.add_field(name="Category:", value=animal.category, inline=True)
             embed.add_field(name="Rarity:", value=animal.rarity, inline=True)
             embed.add_field(name=f"Stats: {total_stats}", value=f"Health: {animal.health}\nAttack: {animal.attack}\nDefense: {animal.defense}\nSpeed: {animal.speed}\n", inline=True)
             embed.add_field(name="Ability:", value=animal.ability, inline=False)
@@ -324,7 +324,7 @@ class BattleView(View):
                 description=f"",
                 color=discord.Color.red()
             )
-            
+            embed.add_field(name="Weather",value=f"{weather.title()}",inline=False)
             # Determine turn order based on speed
             if self.ally.speed > self.foe.speed or (self.ally.speed == self.foe.speed and random.choice([True, False])):
                 await attack(self.ally, self.foe, ally_move, self.player, self.foe, field, embed)
@@ -339,11 +339,11 @@ class BattleView(View):
                     
                     
             # Update embed fields
-            embed.add_field(name=f"{self.ally.name} HP", value=f"{str(max(0, self.ally.health))}/{self.ally.maxhealth}")
-            embed.add_field(name=f"{self.foe.name} HP", value=f"{str(max(0, self.foe.health))}/{self.foe.maxhealth}")
+            embed.add_field(name=f"{self.ally.name}", value=f"HP: {str(max(0, self.ally.health))}/{self.ally.maxhealth}",inline=False)
+            embed.add_field(name=f"{self.foe.name}", value=f"HP: {str(max(0, self.foe.health))}/{self.foe.maxhealth}",inline=False)
             embed.set_thumbnail(url=self.ally.sprite)
             embed.set_image(url=self.spawned_animal.sprite)
-            
+            embed.set_footer(text=f"Biome: {self.player.location}")
             # Check for battle end
             if self.ally.health <= 0 or self.foe.health <= 0:
                 self.battle_over = True
@@ -378,7 +378,7 @@ class BattleView(View):
                 description=f"Your **{self.ally.name}** was defeated by **{self.foe.name}**!",
                 color=discord.Color.dark_red()
             )
-            embed.set_image(url=self.ally.sprite)
+            embed.set_image(url=self.foe.sprite)
             await self.message.edit(embed=embed, view=None)
 
 class EncounterView(View):
@@ -393,17 +393,18 @@ class EncounterView(View):
 
         ally = await convert_allyanimal(self.player.id)
         foe = await convert_wildanimal(self.spawned_animal)
-
+        weather=await get_weather(self.player.location)
         # Send initial battle message
         battle_embed = discord.Embed(
             title="⚔️ Battle Start!",
-            description=f"{ally.name} vs {foe.name}",
+            description=f"**{ally.name}** vs **{foe.name}**",
             color=discord.Color.orange()
         )  # get the message object
-        battle_embed.add_field(name=f"{ally.name} HP", value=f"{str(max(0, ally.health))}/{ally.maxhealth}")
-        battle_embed.add_field(name=f"{foe.name} HP", value=f"{str(max(0, foe.health))}/{foe.maxhealth}")
-        battle_embed.set_thumbnail(url=ally.sprite)
+        battle_embed.add_field(name="Weather",value=f"{weather.title()}",inline=False)
+        battle_embed.add_field(name=f"{ally.name}", value=f"HP: {str(max(0, ally.health))}/{ally.maxhealth}",inline=False)
+        battle_embed.add_field(name=f"{foe.name}", value=f"HP: {str(max(0, foe.health))}/{foe.maxhealth}",inline=False)
         battle_embed.set_image(url=self.spawned_animal.sprite)
+        battle_embed.set_footer(text=f"Biome: {self.player.location}")
         # Pass ONLY the message to BattleView
         battle_view = BattleView(self.player, ally, foe, interaction.message,self.spawned_animal)
         await interaction.edit_original_response(embed=battle_embed, view=battle_view)
@@ -502,7 +503,7 @@ async def encounter(interaction: discord.Interaction):
     embed.set_image(url=spawned_animal.sprite)
     embed.add_field(name="Scientific Name", value=f"*{spawned_animal.scientific_name}*", inline=False)
     embed.add_field(name="Description", value=spawned_animal.description, inline=False)
-    embed.set_footer(text=f"Location: {location_name} | Keep exploring!")
+    embed.set_footer(text=f"Biome: {location_name}")
     view = EncounterView(spawned_animal, p)
     msg = await interaction.followup.send(embed=embed, view=view)
 
@@ -580,7 +581,7 @@ async def spawnlist(interaction: discord.Interaction):
                     defense=row[5],
                     speed=row[7],
                     rarity=row[12],
-                    catagory=row[9],
+                    category=row[9],
                     drops=row[3],
                     sprite=row[11],
                     description=row[13],
