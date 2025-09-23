@@ -607,6 +607,112 @@ async def spawnlist(interaction: discord.Interaction):
         )
     paginator.message = await interaction.followup.send(embed=embed, view=paginator)
 
+@bot.tree.command(name="compare", description="Compare two of your captured animals")
+@app_commands.describe(first="The number of the first animal", second="The number of the second animal")
+async def compare(interaction: discord.Interaction, first: int, second: int):
+    table_name = str(interaction.user.id)
+
+    async with aiosqlite.connect("owned.db") as db:
+        cursor = await db.execute(f"""
+            SELECT name, nickname, sprite, nature, ability, healthp, attackp, defensep, speedp, moves
+            FROM [{table_name}]
+        """)
+        rows = await cursor.fetchall()
+
+    if not rows:
+        await interaction.response.send_message("❌ You don’t own any animals yet!", ephemeral=True)
+        return
+
+    animals = [
+        {
+            "name": row[0],
+            "nickname": row[1],
+            "sprite": row[2],
+            "nature": row[3],
+            "ability": row[4],
+            "healthp": row[5],
+            "attackp": row[6],
+            "defensep": row[7],
+            "speedp": row[8],
+            "moves": json.loads(row[9])
+        }
+        for row in rows
+    ]
+
+    # Clamp indexes
+    idx1 = max(0, min(first - 1, len(animals) - 1))
+    idx2 = max(0, min(second - 1, len(animals) - 1))
+
+    a1 = animals[idx1]
+    a2 = animals[idx2]
+
+    # Fetch spawned animals
+    spawned_a1 = await fetch_animal(a1['name'])
+    spawned_a2 = await fetch_animal(a2['name'])
+
+    # Calculate stats
+    mh1 = await calc_stat(spawned_a1.health, a1['healthp'])
+    ma1 = await calc_stat(spawned_a1.attack, a1['attackp'])
+    md1 = await calc_stat(spawned_a1.defense, a1['defensep'])
+    ms1 = await calc_stat(spawned_a1.speed, a1['speedp'])
+
+    mh2 = await calc_stat(spawned_a2.health, a2['healthp'])
+    ma2 = await calc_stat(spawned_a2.attack, a2['attackp'])
+    md2 = await calc_stat(spawned_a2.defense, a2['defensep'])
+    ms2 = await calc_stat(spawned_a2.speed, a2['speedp'])
+
+    a1_total=mh1+ma1+md1+ms1
+    a2_total=mh2+ma2+md2+ms2
+    
+    embed = discord.Embed(
+        title=f"{a1['nickname']} vs {a2['nickname']}",
+        color=discord.Color.purple()
+    )
+
+    embed.add_field(
+        name="Name",
+        value=f"{a1['name']} | {a2['name']}",
+        inline=False
+    )
+    embed.add_field(
+        name="Nature",
+        value=f"{a1['nature']} | {a2['nature']}",
+        inline=True
+    )
+    embed.add_field(
+        name="Ability",
+        value=f"{a1['ability']} | {a2['ability']}",
+        inline=True
+    )
+    embed.add_field(
+        name="Total",
+        value=f"{a1_total} | {a2_total}",
+        inline=True
+    )
+    embed.add_field(
+        name="Stats",
+        value=f"HP: {mh1} | {mh2}\n"
+              f"Attack: {ma1} | {ma2}\n"
+              f"Defense: {md1} | {md2}\n"
+              f"Speed: {ms1} | {ms2}",
+        inline=False
+    )
+    embed.add_field(
+        name="Moves",
+        value=f"1. {a1['moves'][0]}  |  {a2['moves'][0]}\n"
+              f"2. {a1['moves'][1]}  |  {a2['moves'][1]}\n"
+              f"3. {a1['moves'][2]}  |  {a2['moves'][2]}\n"
+              f"4. {a1['moves'][3]}  |  {a2['moves'][3]}",
+        inline=False
+    )
+    # Optional: show both sprites
+    if a1_total>=a2_total:
+        embed.set_image(url=a1['sprite'])
+    else:
+        embed.set_image(url=a2['sprite'])
+
+    await interaction.response.send_message(embed=embed)
+    
 class AnimalInfoView(discord.ui.View):
     def __init__(self, animals, start_index=0):
         super().__init__(timeout=60)

@@ -9,7 +9,7 @@
     }
   },
   "Rainforest": {
-    "current": "clear",
+    "current": "rain",
     "probabilities": {
       "rain": 0.55,
       "flooding": 0.05,
@@ -19,7 +19,7 @@
     }
   },
   "Desert": {
-    "current": "haboob",
+    "current": "clear",
     "probabilities": {
       "clear": 0.2,
       "drought": 0.5,
@@ -106,7 +106,7 @@
     }
   },
   "Urban": {
-    "current": "overcast",
+    "current": "rain",
     "probabilities": {
       "clear": 0.35,
       "rain": 0.3,
@@ -116,7 +116,7 @@
     }
   },
   "Polar": {
-    "current": "blizzard",
+    "current": "fog",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.35,
@@ -133,7 +133,7 @@
     }
   },
   "Coral Reef": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.5,
       "rain": 0.25,
@@ -145,7 +145,7 @@
     }
   },
   "Kelp Forest": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.45,
       "rain": 0.3,
@@ -153,7 +153,7 @@
     }
   },
   "Mangrove": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.3,
       "rain": 0.45,
@@ -165,7 +165,7 @@
     }
   },
   "Frozen Ocean": {
-    "current": "snow",
+    "current": "clear",
     "probabilities": {
       "snow": 0.3,
       "icequake": 0.1,
@@ -174,7 +174,7 @@
     }
   },
   "River": {
-    "current": "fog",
+    "current": "clear",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -184,7 +184,7 @@
     }
   },
   "Lake": {
-    "current": "thunderstorm",
+    "current": "rain",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -194,7 +194,7 @@
     }
   },
   "Jungle": {
-    "current": "clear",
+    "current": "thunderstorm",
     "probabilities": {
       "rain": 0.4,
       "thunderstorm": 0.3,
