@@ -245,13 +245,14 @@ async def convert_wildanimal(animal):
     async with aiosqlite.connect("Organisms.db") as db:
         async with db.execute("SELECT * FROM Animals WHERE name = ?", (animal.name,)) as cursor:
             row = await cursor.fetchone()
+            naturelist=["Playful","Aggressive","Brutal","Ferocious","Resilient","Hardy","Durable","Stalwart","Guarded","Solid","Swift","Agile","Nimble"]
             if row:
                 battle_animal = BattleAnimal(
                     name=animal.name,
                     sprite=animal.sprite,
                     ability=animal.ability,
                     catagory=animal.catagory,
-                    nature=random.choice(["Brave","Calm","Timid","Jolly","Modest","Bold","Hasty","Quiet","Sassy","Adamant"]),
+                    nature=random.choice(naturelist),
                     moves=await get_moves(row[10].split(",")),
                     drop=random.choice(animal.drops.split(",")),
                     health=await calc_stat(animal.health,animal.healthp),
@@ -259,7 +260,44 @@ async def convert_wildanimal(animal):
                     defense=await calc_stat(animal.defense,animal.defensep),
                     speed=await calc_stat(animal.speed,animal.speedp)
                 )
+                battle_animal= await apply_nature(battle_animal)
                 return battle_animal
+            
+async def apply_nature(animal):
+    NATURES = {
+    "Aggressive":   {"up": "attack", "down": "defense"},
+    "Brutal":       {"up": "attack", "down": "speed"},
+    "Ferocious":    {"up": "attack", "down": "health"},
+    "Resilient":    {"up": "health", "down": "speed"},
+    "Hardy":        {"up": "health", "down": "attack"},
+    "Durable":      {"up": "health", "down": "defense"},
+    "Stalwart":     {"up": "defense", "down": "speed"},
+    "Guarded":      {"up": "defense", "down": "attack"},
+    "Solid":        {"up": "defense", "down": "health"},
+    "Swift":        {"up": "speed", "down": "health"},
+    "Agile":        {"up": "speed", "down": "defense"},
+    "Nimble":       {"up": "speed", "down": "attack"},
+    # Neutral options
+    "Playful":     {"up": None, "down": None}
+}
+    """Applies a random nature effect to an animal object with stats."""
+    nature = random.choice(list(NATURES.keys()))
+    effect = NATURES[nature]
+
+    # Save nature to the animal
+    animal.nature = nature  
+
+    if effect["up"] and effect["down"]:  
+        # Increase one stat by 10%, decrease another by 10%
+        up_attr = effect["up"]
+        down_attr = effect["down"]
+
+        # Apply boost
+        setattr(animal, up_attr, int(getattr(animal, up_attr) * 1.1))
+        # Apply reduction (at least 1)
+        setattr(animal, down_attr, max(1, int(getattr(animal, down_attr) * 0.9)))
+    animal.maxhealth=animal.health
+    return animal
 async def fetch_animal(name):
     async with aiosqlite.connect("Organisms.db") as db:
         cursor = await db.execute("SELECT * FROM Animals where name==?",(name,))

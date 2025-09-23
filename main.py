@@ -84,7 +84,7 @@ class StarterSelect(discord.ui.View):
             "name": "Tuxedo Cat",
             "nickname": "Tuxedo Cat",
             "sprite": "https://i.postimg.cc/8ztCG1zL/tuxedo.png",
-            "nature": "Curious",
+            "nature": "Playful",
             "ability": "Stealthy",
             "healthp": 0,
             "attackp": 0,
@@ -101,7 +101,7 @@ class StarterSelect(discord.ui.View):
             "name": "Tabby Cat",
             "nickname": "Tabby Cat",
             "sprite": "https://i.postimg.cc/rmR3f9HK/tabby.png",
-            "nature": "Bold",
+            "nature": "Playful",
             "ability": "Strong",
             "healthp": 0,
             "attackp": 0,
@@ -337,24 +337,28 @@ class BattleView(View):
                 await attack(self.ally, self.foe, ally_move, self.player, self.foe, field, embed)
                 if self.foe.health > 0:
                     await attack(self.foe, self.ally, random.choice(self.foe.moves), self.foe, self.player, field, embed)
+                else:
+                    self.battle_over = True # Gain training points for winning
             else:
                 await attack(self.foe, self.ally, random.choice(self.foe.moves), self.foe, self.player, field, embed)
                 if self.ally.health > 0:
                     await attack(self.ally, self.foe, ally_move, self.player, self.foe, field, embed)
+                else:
+                    self.battle_over = True
+                    
                     
             # Update embed fields
             embed.add_field(name=f"{self.ally.name} HP", value=f"{str(max(0, self.ally.health))}/{self.ally.maxhealth}")
             embed.add_field(name=f"{self.foe.name} HP", value=f"{str(max(0, self.foe.health))}/{self.foe.maxhealth}")
             embed.set_thumbnail(url=self.ally.sprite)
             embed.set_image(url=self.spawned_animal.sprite)
-
-            await self.message.edit(embed=embed, view=self)
+            if not self.battle_over:
+                await interaction.message.edit(embed=embed, view=self)
             
             # Check for battle end
             if self.ally.health <= 0 or self.foe.health <= 0:
                 self.battle_over = True
                 await self.end_battle()
-                return
                 
         except Exception as e:
             print(f"Error during battle turn: {e}")
@@ -366,7 +370,9 @@ class BattleView(View):
             if not self.battle_over:
                 for item in self.children:
                     item.disabled = False
-                await self.message.edit(view=self)
+                await interaction.message.edit(embed=embed, view=self)
+            else:
+                await self.end_battle()
             self.turn += 1
             
     async def end_battle(self):
@@ -375,14 +381,15 @@ class BattleView(View):
             new_view = CaptureLootView(self.spawned_animal, self.player)
             embed = discord.Embed(
                 title=f"🎉 {self.player.name} won!",
-                description=f"Your {self.ally.name} defeated **{self.foe.name}**! What will you do now?",
+                description=f"Your **{self.ally.name}** defeated **{self.foe.name}**! What will you do now?",
                 color=discord.Color.green()
             )
+            embed.set_image(url=self.foe.sprite)
             await self.message.edit(embed=embed, view=new_view)
         else:
             embed = discord.Embed(
                 title=f"💀 Defeated!",
-                description=f"Your {self.ally.name} were defeated by **{self.foe.name}**.",
+                description=f"Your **{self.ally.name}** was defeated by **{self.foe.name}**!",
                 color=discord.Color.dark_red()
             )
             embed.set_image(url=self.ally.sprite)
@@ -500,10 +507,6 @@ async def encounter(interaction: discord.Interaction):
     spawned_animal.attackp=random.randint(-50,50)
     spawned_animal.defensep=random.randint(-50,50)
     spawned_animal.speedp=random.randint(-50,50)
-    mh=await calc_stat(spawned_animal.health,spawned_animal.healthp)
-    ma=await calc_stat(spawned_animal.attack,spawned_animal.attackp)
-    md=await calc_stat(spawned_animal.defense,spawned_animal.defensep)
-    ms=await calc_stat(spawned_animal.speed,spawned_animal.speedp)
     embed = discord.Embed(
         title=f"{(spawned_animal.name).title()} Appeared!",
         description=f"You were searching in {location.biome}!",
@@ -511,9 +514,8 @@ async def encounter(interaction: discord.Interaction):
     )
 
     embed.set_image(url=spawned_animal.sprite)
-    embed.add_field(name="Scientific Name", value=f"*{spawned_animal.scientific_name}*", inline=True)
+    embed.add_field(name="Scientific Name", value=f"*{spawned_animal.scientific_name}*", inline=False)
     embed.add_field(name="Description", value=spawned_animal.description, inline=False)
-    embed.add_field(name="Stats", value=f"HP: {mh}\nAttack: {ma}\nDefense: {md}\nSpeed: {ms}", inline=True)
     embed.set_footer(text=f"Location: {location_name} | Keep exploring!")
     view = EncounterView(spawned_animal, p)
     msg = await interaction.followup.send(embed=embed, view=view)
