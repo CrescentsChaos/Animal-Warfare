@@ -292,19 +292,12 @@ class BattleView(View):
 
     def create_move_button(self, move_name):
         button = Button(label=move_name, style=discord.ButtonStyle.green)
-
         async def callback(interaction: discord.Interaction):
             if self.battle_over:
                 await interaction.response.send_message("⚠️ Battle already ended.", ephemeral=True)
                 return
-
             # Acknowledge the interaction to prevent the "Interaction Failed" error
             await interaction.response.defer()
-
-            # Disable buttons immediately
-            for item in self.children:
-                item.disabled = True
-            
             # The message edit will now be handled inside process_turn after deferring
             await self.process_turn(interaction, move_name)
 
@@ -337,14 +330,12 @@ class BattleView(View):
                 await attack(self.ally, self.foe, ally_move, self.player, self.foe, field, embed)
                 if self.foe.health > 0:
                     await attack(self.foe, self.ally, random.choice(self.foe.moves), self.foe, self.player, field, embed)
-                else:
-                    self.battle_over = True # Gain training points for winning
+                
             else:
                 await attack(self.foe, self.ally, random.choice(self.foe.moves), self.foe, self.player, field, embed)
                 if self.ally.health > 0:
                     await attack(self.ally, self.foe, ally_move, self.player, self.foe, field, embed)
-                else:
-                    self.battle_over = True
+                
                     
                     
             # Update embed fields
@@ -352,27 +343,22 @@ class BattleView(View):
             embed.add_field(name=f"{self.foe.name} HP", value=f"{str(max(0, self.foe.health))}/{self.foe.maxhealth}")
             embed.set_thumbnail(url=self.ally.sprite)
             embed.set_image(url=self.spawned_animal.sprite)
-            if not self.battle_over:
-                await interaction.message.edit(embed=embed, view=self)
             
             # Check for battle end
             if self.ally.health <= 0 or self.foe.health <= 0:
                 self.battle_over = True
                 await self.end_battle()
-                
+                return
+            for item in self.children:
+                item.disabled = False
+            await interaction.message.edit(embed=embed, view=self)  
+            
         except Exception as e:
             print(f"Error during battle turn: {e}")
             traceback.print_exc() 
             await self.message.edit(content=f"An unexpected error occurred during the battle. Please try again. Error: `{e}`", view=None)
             
         finally:
-            # This code will always run, but only re-enables buttons if the battle isn't over.
-            if not self.battle_over:
-                for item in self.children:
-                    item.disabled = False
-                await interaction.message.edit(embed=embed, view=self)
-            else:
-                await self.end_battle()
             self.turn += 1
             
     async def end_battle(self):
