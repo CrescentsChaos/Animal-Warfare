@@ -1,10 +1,11 @@
 from importlist import *
+from moves import *
 
-def get_weather(biome: str) -> str:
+async def get_weather(biome: str) -> str:
     # open the weather.json file (where all biome weather is stored)
-    with open(WEATHER_FILE, "r") as f:
+    with open('weather.json', "r") as f:
         data = json.load(f)   # load JSON into a Python dict
-
+        
     # return the "current" weather value for the biome you asked for
     return data[biome]["current"]
 
@@ -123,6 +124,7 @@ async def save_capture(player, animal):
                 nickname TEXT,
                 sprite TEXT,
                 nature TEXT,
+                ability TEXT,
                 healthp INTEGER,
                 attackp INTEGER,
                 defensep INTEGER,
@@ -131,19 +133,21 @@ async def save_capture(player, animal):
                 training INTEGER
             )
         """)
-        mod_move = await get_moves(animal.moves.split(","))
+        new=animal.moves.split(",")
+        mod_move = await get_moves(new)
         # Insert animal data
         await db.execute(f"""
             INSERT INTO [{table_name}] 
             (name,nickname,
-            sprite, nature, 
+            sprite, nature, ability,
              healthp, attackp, defensep, speedp, moves,training)
-            VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?,?)
         """, (
             animal.name,
             animal.name,
             animal.sprite,
             animal.nature,
+            animal.ability,
             animal.healthp,
             animal.attackp,
             animal.defensep,
@@ -189,6 +193,53 @@ async def get_moves(movelist, num=4):
     new=random.sample(movelist, min(num, len(movelist)))
     # Randomly select 'num' unique moves from the movelist
     return new
+
+            
+async def convert_allyanimal(user_id: int) -> BattleAnimal | None:
+    # 1️⃣ Get companion ID from playerdata.db
+    async with aiosqlite.connect("playerdata.db") as db:
+        cursor = await db.execute(f"SELECT companion FROM [{user_id}]")
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        companion_id = row[0]
+    # 2️⃣ Get companion data from owned.db
+    async with aiosqlite.connect("owned.db") as db:
+        cursor = await db.execute(f"""
+            SELECT name, sprite, ability, nature, moves, healthp, attackp, defensep, speedp
+            FROM [{user_id}]
+            WHERE id = ?
+        """, (companion_id,))
+        row = await cursor.fetchone()
+        if not row:
+            return None
+
+        name, sprite, ability, nature, moves_json, healthp, attackp, defensep, speedp = row
+        moves = json.loads(moves_json)
+    async with aiosqlite.connect("Organisms.db") as db:
+        cursor = await db.execute(f"""
+            SELECT health, attack, defense, speed, catagory
+            FROM Animals
+            WHERE name = ?
+        """, (name,))
+        animalstat = await cursor.fetchone()
+    # 3️⃣ Create BattleAnimal
+    # Here 'drop' can be empty or fetched later
+    battle_animal = BattleAnimal(
+        name=name,
+        sprite=sprite,  # You can customize later
+        ability=ability,
+        catagory=animalstat[4],  # You can customize later
+        nature=nature,
+        moves=moves,
+        drop=None,   # You can customize later
+        health=await calc_stat(animalstat[0],healthp),
+        attack=await calc_stat(animalstat[1],attackp),
+        defense=await calc_stat(animalstat[2],defensep),
+        speed=await calc_stat(animalstat[3],speedp)
+    )
+
+    return battle_animal
        
 async def convert_wildanimal(animal):
     async with aiosqlite.connect("Organisms.db") as db:
@@ -197,9 +248,11 @@ async def convert_wildanimal(animal):
             if row:
                 battle_animal = BattleAnimal(
                     name=animal.name,
+                    sprite=animal.sprite,
                     ability=animal.ability,
+                    catagory=animal.catagory,
                     nature=random.choice(["Brave","Calm","Timid","Jolly","Modest","Bold","Hasty","Quiet","Sassy","Adamant"]),
-                    moves=await get_moves(row[10]),
+                    moves=await get_moves(row[10].split(",")),
                     drop=random.choice(animal.drops.split(",")),
                     health=await calc_stat(animal.health,animal.healthp),
                     attack=await calc_stat(animal.attack,animal.attackp),
@@ -230,9 +283,50 @@ async def fetch_animal(name):
             nature=random.choice(["Brave","Calm","Timid","Jolly","Modest","Bold","Hasty","Quiet","Sassy","Adamant"])
         )
 
-    return animal        
-async def battle(ally,foe,battle_type):
-    if battle_type=="wild":
-        foe=await convert_wildanimal(foe)
-    return ally.id
+    return animal 
+    
+async def get_animal_name(user_id: int, animal_id: int) -> str | None:
+    """
+    Fetch an animal's nickname (if set) or name from owned.db.
+    Returns None if the animal doesn't exist.
+    """
+    async with aiosqlite.connect("owned.db") as db:
+        await db.execute(f"""
+            CREATE TABLE IF NOT EXISTS [{user_id}] (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                nickname TEXT,
+                sprite TEXT,
+                nature TEXT,
+                ability TEXT,
+                healthp INTEGER,
+                attackp INTEGER,
+                defensep INTEGER,
+                speedp INTEGER,
+                moves TEXT,
+                training INTEGER
+            )
+        """)
+        await db.commit()
+
+        cursor = await db.execute(f"SELECT name, nickname FROM [{user_id}] WHERE id = ?", (animal_id,))
+        result = await cursor.fetchone()
+
+    if not result:
+        return None  # No such animal owned by player
+
+    name, nickname = result
+    return nickname if nickname else name   
+
+async def attack(attacker,defender,move,player,foe,field,embed):
+    attacks={
+        "Tackle" : tackle,
+        "Scratch" : scratch,
+        "Bite" : bite,
+        "Peck" : peck,
+    }
+    if move in attacks:
+        await attacks[move](attacker,defender,move,player,foe,field,embed)
+        
+    
     

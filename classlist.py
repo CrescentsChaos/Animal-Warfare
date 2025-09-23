@@ -34,8 +34,10 @@ class Animal:
         self.training = training
         
 class BattleAnimal:
-    def __init__(self, name, ability, nature, moves, drop, health,attack,defense,speed):
+    def __init__(self, name, sprite,catagory, ability, nature, moves, drop, health,attack,defense,speed):
         self.name = name
+        self.sprite = sprite
+        self.catagory = catagory
         self.ability = ability
         self.moves = moves
         self.nature = nature
@@ -50,6 +52,7 @@ class BattleAnimal:
         self.attackboost = 0
         self.defenseboost = 0
         self.speedboost = 0
+        self.maxhealth = health
         
 class Player:
     def __init__(self, name, location, inventory,idt):
