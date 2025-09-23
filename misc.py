@@ -72,6 +72,7 @@ async def get_animals_by_biome(biome):
         async with aiosqlite.connect("Organisms.db") as db:
             async with db.execute("SELECT * FROM Animals WHERE habitat LIKE ?", ('%' + biome + '%',)) as cursor:
                 rows = await cursor.fetchall()
+                naturelist=["Playful","Aggressive","Brutal","Ferocious","Resilient","Hardy","Durable","Stalwart","Guarded","Solid","Swift","Agile","Nimble"]
                 for row in rows:
                     animal = Animal(
                         name=row[0],
@@ -88,7 +89,7 @@ async def get_animals_by_biome(biome):
                         sprite=row[11],
                         description=row[13],
                         moves=row[10],
-                        nature=random.choice(["Brave","Calm","Timid","Jolly","Modest","Bold","Hasty","Quiet","Sassy","Adamant"])
+                        nature=random.choice(naturelist)
                     )
                     animals.append(animal)
                     
@@ -302,7 +303,7 @@ async def fetch_animal(name):
     async with aiosqlite.connect("Organisms.db") as db:
         cursor = await db.execute("SELECT * FROM Animals where name==?",(name,))
         row = await cursor.fetchone()
-
+    naturelist=["Playful","Aggressive","Brutal","Ferocious","Resilient","Hardy","Durable","Stalwart","Guarded","Solid","Swift","Agile","Nimble"]
     animal = Animal(
             name=row[0],
             scientific_name=row[1],
@@ -318,7 +319,7 @@ async def fetch_animal(name):
             sprite=row[11],
             rarity=row[12],
             description=row[13],
-            nature=random.choice(["Brave","Calm","Timid","Jolly","Modest","Bold","Hasty","Quiet","Sassy","Adamant"])
+            nature=random.choice(name)
         )
 
     return animal 
