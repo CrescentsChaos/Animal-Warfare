@@ -1,6 +1,6 @@
 {
   "Savanna": {
-    "current": "rain",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.6,
       "rain": 0.2,
@@ -9,7 +9,7 @@
     }
   },
   "Rainforest": {
-    "current": "rain",
+    "current": "thunderstorm",
     "probabilities": {
       "rain": 0.55,
       "flooding": 0.05,
@@ -37,7 +37,7 @@
     }
   },
   "Ocean": {
-    "current": "rain",
+    "current": "hurricane",
     "probabilities": {
       "clear": 0.45,
       "rain": 0.25,
@@ -47,7 +47,7 @@
     }
   },
   "Mountain": {
-    "current": "overcast",
+    "current": "clear",
     "probabilities": {
       "overcast": 0.3,
       "snow": 0.2,
@@ -67,7 +67,7 @@
     }
   },
   "Taiga": {
-    "current": "snow",
+    "current": "fog",
     "probabilities": {
       "snow": 0.5,
       "clear": 0.25,
@@ -88,7 +88,7 @@
     }
   },
   "Volcano": {
-    "current": "clear",
+    "current": "lava_glow",
     "probabilities": {
       "clear": 0.3,
       "ashfall": 0.3,
@@ -106,7 +106,7 @@
     }
   },
   "Urban": {
-    "current": "rain",
+    "current": "overcast",
     "probabilities": {
       "clear": 0.35,
       "rain": 0.3,
@@ -116,7 +116,7 @@
     }
   },
   "Polar": {
-    "current": "fog",
+    "current": "snow",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.35,
@@ -125,7 +125,7 @@
     }
   },
   "Deep Sea": {
-    "current": "darkness",
+    "current": "currents",
     "probabilities": {
       "calm": 0.5,
       "currents": 0.3,
@@ -153,7 +153,7 @@
     }
   },
   "Mangrove": {
-    "current": "clear",
+    "current": "rain",
     "probabilities": {
       "clear": 0.3,
       "rain": 0.45,
@@ -174,7 +174,7 @@
     }
   },
   "River": {
-    "current": "clear",
+    "current": "flooding",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -184,7 +184,7 @@
     }
   },
   "Lake": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -194,7 +194,7 @@
     }
   },
   "Jungle": {
-    "current": "thunderstorm",
+    "current": "rain",
     "probabilities": {
       "rain": 0.4,
       "thunderstorm": 0.3,

@@ -2,13 +2,15 @@ import discord
 import math
 
 class Location:
-    def __init__(self, biome, terrain , time, disaster, loot,image):
+    def __init__(self, biome, weather, terrain , time, disaster, loot,image):
         self.biome = biome
+        self.weather=weather
         self.terrain = terrain
         self.time = time
         self.disaster = disaster
         self.loot = loot
         self.image = image
+        self.effects=True
         
 class Animal:
     def __init__(self, name, scientific_name, nature,habitat,ability, health, attack, defense, speed, category, rarity, drops,sprite,description,moves,healthp=0,attackp=0,defensep=0,speedp=0,training=0):
@@ -41,7 +43,7 @@ class BattleAnimal:
         self.ability = ability
         self.moves = moves
         self.nature = nature
-        self.status = "Alive"
+        self.status = []
         self.drop = drop
         self.health = health
         self.attack = attack
@@ -49,10 +51,11 @@ class BattleAnimal:
         self.speed = speed
         self.flinch = False
         self.confused = False
-        self.attackboost = 0
-        self.defenseboost = 0
-        self.speedboost = 0
+        self.attackboost = 1
+        self.defenseboost = 1
+        self.speedboost = 1
         self.maxhealth = health
+        self.oxygen=100
         
 class Player:
     def __init__(self, name, location, inventory,idt):

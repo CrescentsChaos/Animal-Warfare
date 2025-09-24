@@ -1,5 +1,4 @@
 from misc import *
-
 class StarterSelect(discord.ui.View):
     def __init__(self, user_id):
         super().__init__(timeout=60)  # 60 sec timeout
@@ -44,13 +43,15 @@ class StarterSelect(discord.ui.View):
             ))
 
             await db.commit()
-
+        # Disable all buttons so user can't click again
+        for child in self.children:
+            child.disabled = True
         embed = discord.Embed(
             title=f"🎉 You chose {starter['name']}!",
             description=f"**Nature:** {starter['nature']}\nYour journey begins now!",
             color=discord.Color.green()
         )
-        embed.set_thumbnail(url=starter["sprite"])  # Small preview in corner
+        
         embed.set_image(url=starter["sprite"])      # Big full image
         embed.set_footer(text="Your new companion has joined your adventure!")
 
@@ -115,15 +116,17 @@ class StarterSelect(discord.ui.View):
 @bot.tree.command(name="start", description="Starts the game.")
 async def start(ctx: discord.Interaction):
     async with aiosqlite.connect("playerdata.db") as db:
-        # Check if this user already has a table
         async with db.execute(
             "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
             (str(ctx.user.id),)
         ) as cursor:
             row = await cursor.fetchone()
+        
         if row:
-            await ctx.response.send_message("You already have an account!")
+            # Use ephemeral so only the user sees it
+            await ctx.response.send_message("You already have an account!", ephemeral=True)
             return
+        
         # Create table for this user
         await db.execute(f"""
             CREATE TABLE IF NOT EXISTS [{ctx.user.id}] (
@@ -138,6 +141,7 @@ async def start(ctx: discord.Interaction):
                 companion INTEGER
             )
         """)
+        
         # Insert starting data
         clk = datetime.datetime.now()
         ca = clk.strftime("%Y-%m-%d %H:%M:%S")
@@ -146,16 +150,17 @@ async def start(ctx: discord.Interaction):
                 1000,        -- balance
                 100,         -- health
                 0,           -- deathcount
-                "Urban",      -- location
+                "Urban",     -- location
                 "[]",        -- inventory
                 ?,           -- creation date
                 0,           -- winstreak
                 0,           -- highstreak
-                1       -- companion
+                1            -- companion
             )
         """, (ca,))
-        # Save changes
         await db.commit()
+    
+    # Send starter selection view
     view = StarterSelect(ctx.user.id)
     await ctx.response.send_message(
         "🎉 Account created! Choose your starter cat:",
@@ -317,7 +322,7 @@ class BattleView(View):
 
             # Your battle logic here...
             weather = await get_weather(self.player.location)
-            field = Location(biome=self.player.location, terrain="Normal", time="None", disaster="None", loot="None", image="None")
+            field = Location(biome=self.player.location, weather=weather, terrain="Normal", time="None", disaster="None", loot="None", image="None")
             
             embed = discord.Embed(
                 title=f"⚔️ Turn {self.turn}",
@@ -325,23 +330,28 @@ class BattleView(View):
                 color=discord.Color.red()
             )
             embed.add_field(name="Weather",value=f"{weather.title()}",inline=False)
+            await environmenteff(self.ally,self.foe,field,embed)
+            foe_move=random.choice(self.foe.moves)
             # Determine turn order based on speed
-            if self.ally.speed > self.foe.speed or (self.ally.speed == self.foe.speed and random.choice([True, False])):
+            if self.ally.speed*self.ally.speedboost > self.foe.speed*self.foe.speedboost or (self.ally.speed*self.ally.speedboost == self.foe.speed*self.foe.speedboost and random.choice([True, False])):
                 await attack(self.ally, self.foe, ally_move, self.player, self.foe, field, embed)
                 if self.foe.health > 0:
-                    await attack(self.foe, self.ally, random.choice(self.foe.moves), self.foe, self.player, field, embed)
+                    await attack(self.foe, self.ally, foe_move, self.foe, self.player, field, embed)
+                await statuscheck(self.ally,self.foe,ally_move,self.player,self.foe,field,embed)
+                await statuscheck(self.foe,self.ally,foe_move,self.foe,self.player,field,embed)
                 
             else:
                 await attack(self.foe, self.ally, random.choice(self.foe.moves), self.foe, self.player, field, embed)
                 if self.ally.health > 0:
                     await attack(self.ally, self.foe, ally_move, self.player, self.foe, field, embed)
+                await statuscheck(self.foe,self.ally,foe_move,self.foe,self.player,field,embed)
+                await statuscheck(self.ally,self.foe,ally_move,self.player,self.foe,field,embed)
                 
                     
                     
             # Update embed fields
             embed.add_field(name=f"{self.ally.name}", value=f"HP: {str(max(0, self.ally.health))}/{self.ally.maxhealth}",inline=False)
             embed.add_field(name=f"{self.foe.name}", value=f"HP: {str(max(0, self.foe.health))}/{self.foe.maxhealth}",inline=False)
-            embed.set_thumbnail(url=self.ally.sprite)
             embed.set_image(url=self.spawned_animal.sprite)
             embed.set_footer(text=f"Biome: {self.player.location}")
             # Check for battle end
@@ -349,8 +359,9 @@ class BattleView(View):
                 self.battle_over = True
                 await self.end_battle()
                 return
-            for item in self.children:
-                item.disabled = False
+            if not self.battle_over:
+                for item in self.children:
+                    item.disabled = False
             await interaction.message.edit(embed=embed, view=self)  
             
         except Exception as e:
@@ -412,7 +423,7 @@ class EncounterView(View):
     @button(label="🏃 Run", style=discord.ButtonStyle.gray)
     async def run_button(self, interaction: discord.Interaction, button: Button):
         await interaction.response.edit_message(
-            content="🏃 You escaped safely!",
+            content="🏃 You escaped safely!",embed=None,
             view=None
         )
 
@@ -444,9 +455,8 @@ class CaptureLootView(View):
         
 @bot.tree.command(name="encounter", description="Starts a new wilderness encounter.")
 async def encounter(interaction: discord.Interaction):
-    
-    """A command to initiate a new encounter."""
-    await interaction.response.defer()  # Acknowledge immediately
+    """A command to initiate a new encounter.""" # Acknowledge immediately
+    await interaction.response.defer()
     async with aiosqlite.connect("playerdata.db") as db:
         # Check if the user has a table
         async with db.execute(

@@ -50,9 +50,11 @@ async def get_location(loc):
         async with aiosqlite.connect("earth.db") as db:
             async with db.execute("SELECT * FROM biomes where name==?",(loc,)) as cursor:
                 row = await cursor.fetchone()
+                wt=await get_weather(row[0])
                 if row:
                     location = Location(
                         biome=row[0],
+                        weather=wt,
                         terrain=row[1],
                         time=None,       # leave as None if not in DB
                         disaster=None,   # leave as None if not in DB
@@ -356,7 +358,34 @@ async def get_animal_name(user_id: int, animal_id: int) -> str | None:
 
     name, nickname = result
     return nickname if nickname else name   
+async def environmenteff(animal1,animal2,field,embed):
+    if not field.effects:
+        return
+    elif field.effects:
+        field.effects=False
+    if field.weather.title()=="Thunderstorm":
+        if "Flying" in animal1.category:
+            animal1.speed*=0.75
+            embed.add_field(name="Disadvantage!",value=f"Thunderstorm is halting {animal1.name}'s speed.",inline=False)
+        if "Flying" in animal2.category:
+            animal2.speed*=0.75
+            embed.add_field(name="Disadvantage!",value=f"Thunderstorm is halting {animal2.name}'s speed.",inline=False)
+    if field.biome in ["Ocean","River","Frozen Ocean"]:
+        if "Aquatic" not in animal1.category and "Flying" not in animal1.category:
+            animal1.status.append("Drown") 
+            embed.add_field(name="Disadvantage!",value=f"{animal1.name} is drowning.",inline=False)  
+        if "Aquatic" not in animal2.category and "Flying" not in animal2.category:
+            animal2.status.append("Drown") 
+            embed.add_field(name="Disadvantage!",value=f"{animal2.name} is drowning.",inline=False) 
 
+async def statuscheck(attacker,defender,move,player,foe,field,embed):
+    if "Drown" in attacker.status:
+        attacker.oxygen-=20  
+        embed.add_field(name="Drowning!",value=f"{attacker.name}'s oxygen is depleting.",inline=False)  
+    if "Drown" in attacker.status and attacker.oxygen<=0:
+        attacker.health=0
+        embed.add_field(name="Drowned!",value=f"{attacker.name}'s drowned completely.",inline=False)
+                      
 async def attack(attacker,defender,move,player,foe,field,embed):
     attacks={
         "Tackle" : tackle,
@@ -364,7 +393,15 @@ async def attack(attacker,defender,move,player,foe,field,embed):
         "Bite" : bite,
         "Peck" : peck,
         "Pounce" : pounce,
-        "Tail Whip" : tailwhip
+        "Tail Whip" : tailwhip,
+        "Electricution": electricution,
+        "Gore": gore,
+        "Suction": suction,
+        "Death Roll": deathroll,
+        "Piercing Beak": piercingbeak,
+        "Venomous Fang": venomousfang,
+        "Fin Slash": finslash,
+        "Predatory Surge": predatorysurge
     }
     if move in attacks:
         await attacks[move](attacker,defender,move,player,foe,field,embed)
