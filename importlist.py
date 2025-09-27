@@ -15,7 +15,7 @@ import asyncio
 import traceback
 import datetime
 import json
-from flask import Flask
+from flask import Flask, send_file, request, abort
 from threading import Thread
 from dotenv import load_dotenv
 from waitress import serve
@@ -46,6 +46,29 @@ def run():
 def keep_alive():
     t = Thread(target=run)
     t.start()
+DB_FOLDER = "./"   # change if they’re inside a subfolder
+
+secret_key = 123
+@app.route("/download-db")
+def download_db():
+    key = request.args.get("key")
+    if key != secret_key:
+        abort(403)
+
+    db_name = request.args.get("name")
+    if not db_name:
+        abort(400, "Missing ?name= parameter")
+
+    # Only allow .db files (avoid exposing other files!)
+    if not db_name.endswith(".db"):
+        abort(400, "Invalid file type")
+
+    db_path = os.path.join(DB_FOLDER, db_name)
+
+    if not os.path.exists(db_path):
+        abort(404, "File not found")
+
+    return send_file(db_path, as_attachment=True)
 
 WEATHER_FILE = "weather.json"
 
