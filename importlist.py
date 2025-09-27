@@ -48,7 +48,7 @@ def keep_alive():
     t.start()
 DB_FOLDER = "./"   # change if they’re inside a subfolder
 
-secret_key = 123
+secret_key = "123"
 @app.route("/download-db")
 def download_db():
     key = request.args.get("key")
