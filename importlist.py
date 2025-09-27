@@ -49,26 +49,19 @@ def keep_alive():
 DB_FOLDER = "./"   # change if they’re inside a subfolder
 
 secret_key = "123"
-@app.route("/download-db")
-def download_db():
-    key = request.args.get("key")
+@app.route("/download-db/<db_name>")
+def download_db(db_name):
+    key = "123"  # or get from request.args
     if key != secret_key:
         abort(403)
 
-    db_name = request.args.get("name")
-    if not db_name:
-        abort(400, "Missing ?name= parameter")
-
-    # Only allow .db files (avoid exposing other files!)
     if not db_name.endswith(".db"):
         abort(400, "Invalid file type")
 
-    db_path = os.path.join(DB_FOLDER, db_name)
-
-    if not os.path.exists(db_path):
+    if not os.path.exists(db_name):
         abort(404, "File not found")
 
-    return send_file(db_path, as_attachment=True)
+    return send_file(db_name, as_attachment=True)
 
 WEATHER_FILE = "weather.json"
 
