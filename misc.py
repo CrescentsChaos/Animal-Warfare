@@ -415,7 +415,9 @@ async def attack(attacker,defender,move,player,foe,field,embed):
         "Predatory Surge": predatorysurge,
         "Dash" : dash,
         "Leap" : leap,
-        "Dig" : dig
+        "Dig" : dig,
+        "Claw Swipe" : clawswipe,
+        "Ram" : ram
     }
     if move in attacks and "Flinch" not in attacker.status:
         await attacks[move](attacker,defender,move,player,foe,field,embed)

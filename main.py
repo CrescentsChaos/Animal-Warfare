@@ -365,6 +365,7 @@ class BattleView(View):
             # Check for battle end
             if self.ally.health <= 0 or self.foe.health <= 0:
                 self.battle_over = True
+                await interaction.followup.send(embed=embed, view=None) 
                 await self.end_battle()
                 return
             if not self.battle_over:
