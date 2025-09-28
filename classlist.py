@@ -35,6 +35,7 @@ class Animal:
         self.speedp = speedp
         self.training = training
         
+        
 class BattleAnimal:
     def __init__(self, name, sprite,category, ability, nature, moves, drop, health,attack,defense,speed):
         self.name = name
@@ -56,6 +57,8 @@ class BattleAnimal:
         self.speedboost = 1
         self.maxhealth = health
         self.oxygen=100
+        self.stamina = self.health+self.speed
+        self.maxstamina = self.stamina
         
 class Player:
     def __init__(self, name, location, inventory,idt):

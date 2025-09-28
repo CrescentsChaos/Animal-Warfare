@@ -131,8 +131,6 @@ async def tailwhip(attacker,defender,move,player,foe,field,embed):
     await defensechange(defender,attacker,50,-0.25,embed,defender)
     
 async def howl(attacker,defender,move,player,foe,field,embed):
-    # Basic damage calculation
-    base_damage = 20
     movetype="Predator"
     embed.add_field(name=f"{attacker.name} used {move}!", value=f"Howl was heard from miles away!", inline=False)
     await attackchange(attacker,attacker,100,0.5,embed,defender)
@@ -299,7 +297,15 @@ async def drown(attacker,defender,percentage,embed):
     if chance<=percentage and "Drown" not in defender.status:
         defender.status.append("Drown")
         embed.add_field(name="Drown!",value=f"{defender.name} is drowning.",inline=False)
-                        
+
+async def staminacost(attacker,cost,embed):
+    attacker.stamina+=cost
+    if attacker.stamina>attacker.maxstamina:
+        attacker.stamina=attacker.maxstamina
+    if attacker.stamina<0:
+        attacker.stamina=0
+        embed.add_field(name="Out of stamina!",value=f"{attacker.name} is now out of stamina.",inline=False)
+                                
 async def attackchange(victim,attacker,percentage,boost,embed,defender):
     chance=random.randint(1,100)
     if chance<=percentage and victim.attackboost!=3 and boost>0:

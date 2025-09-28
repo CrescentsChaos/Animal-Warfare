@@ -248,6 +248,7 @@ async def anidex(interaction: discord.Interaction, name: str):
             animal = Animal(
                 name=row[0],
                 scientific_name=row[1],
+                nature="",
                 habitat=row[2],
                 ability=row[8],
                 health=row[6],
@@ -585,6 +586,7 @@ async def spawnlist(interaction: discord.Interaction):
                     name=row[0],
                     scientific_name=row[1],
                     habitat=row[2],
+                    nature="",
                     ability=row[8],
                     health=row[6],
                     attack=row[4],

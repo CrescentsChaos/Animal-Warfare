@@ -387,6 +387,7 @@ async def statuscheck(attacker,defender,move,player,foe,field,embed):
         embed.add_field(name="Drowned!",value=f"{attacker.name}'s drowned completely.",inline=False)
                       
 async def attack(attacker,defender,move,player,foe,field,embed):
+    await staminacost(attacker,20,embed)
     attacks={
         "Tackle" : tackle,
         "Scratch" : scratch,
