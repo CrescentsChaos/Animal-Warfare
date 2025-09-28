@@ -1,6 +1,6 @@
 {
   "Savanna": {
-    "current": "thunderstorm",
+    "current": "clear",
     "probabilities": {
       "clear": 0.6,
       "rain": 0.2,
@@ -9,7 +9,7 @@
     }
   },
   "Rainforest": {
-    "current": "thunderstorm",
+    "current": "rain",
     "probabilities": {
       "rain": 0.55,
       "flooding": 0.05,
@@ -28,7 +28,7 @@
     }
   },
   "Tundra": {
-    "current": "blizzard",
+    "current": "clear",
     "probabilities": {
       "snow": 0.5,
       "blizzard": 0.3,
@@ -47,7 +47,7 @@
     }
   },
   "Mountain": {
-    "current": "fog",
+    "current": "clear",
     "probabilities": {
       "overcast": 0.3,
       "snow": 0.2,
@@ -57,7 +57,7 @@
     }
   },
   "Swamp": {
-    "current": "thunderstorm",
+    "current": "clear",
     "probabilities": {
       "rain": 0.45,
       "clear": 0.25,
@@ -67,7 +67,7 @@
     }
   },
   "Taiga": {
-    "current": "blizzard",
+    "current": "snow",
     "probabilities": {
       "snow": 0.5,
       "clear": 0.25,
@@ -76,7 +76,7 @@
     }
   },
   "Coastal": {
-    "current": "rain",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -88,7 +88,7 @@
     }
   },
   "Volcano": {
-    "current": "lava_glow",
+    "current": "smoke",
     "probabilities": {
       "clear": 0.3,
       "ashfall": 0.3,
@@ -98,7 +98,7 @@
     }
   },
   "Cave": {
-    "current": "damp",
+    "current": "dry",
     "probabilities": {
       "damp": 0.5,
       "dry": 0.4,
@@ -106,7 +106,7 @@
     }
   },
   "Urban": {
-    "current": "clear",
+    "current": "thunderstorm",
     "probabilities": {
       "clear": 0.35,
       "rain": 0.3,
@@ -174,7 +174,7 @@
     }
   },
   "River": {
-    "current": "rain",
+    "current": "clear",
     "probabilities": {
       "clear": 0.4,
       "rain": 0.3,
@@ -194,7 +194,7 @@
     }
   },
   "Jungle": {
-    "current": "thunderstorm",
+    "current": "rain",
     "probabilities": {
       "rain": 0.4,
       "thunderstorm": 0.3,

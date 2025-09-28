@@ -93,6 +93,16 @@ async def scratch(attacker,defender,move,player,foe,field,embed):
     defender.health -= damage
     embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
 
+async def clawswipe(attacker,defender,move,player,foe,field,embed):
+    # Basic damage calculation
+    base_damage = 75
+    movetype="Agile"
+    catboost=await get_damage_multiplier(attacker, defender,movetype)
+    damage= await dmg(attacker, defender, base_damage, move, field,embed,catboost)
+    defender.health -= damage
+    embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
+    await bleed(attacker,defender,10,embed)
+    
 async def bite(attacker,defender,move,player,foe,field,embed):
     # Basic damage calculation
     base_damage = 65
@@ -110,7 +120,16 @@ async def peck(attacker,defender,move,player,foe,field,embed):
     damage= await dmg(attacker, defender, base_damage, move, field,embed,catboost)
     defender.health -= damage
     embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
-    
+
+async def dig(attacker,defender,move,player,foe,field,embed):
+    # Basic damage calculation
+    base_damage = 60
+    movetype="Burrowing"
+    catboost=await get_damage_multiplier(attacker, defender,movetype)
+    damage= await dmg(attacker, defender, base_damage, move, field,embed,catboost)
+    defender.health -= damage
+    embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)    
+
 async def pounce(attacker,defender,move,player,foe,field,embed):
     # Basic damage calculation
     base_damage = 50
@@ -129,11 +148,51 @@ async def tailwhip(attacker,defender,move,player,foe,field,embed):
     defender.health -= damage
     embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
     await defensechange(defender,attacker,50,-0.25,embed,defender)
-    
+
+async def ram(attacker,defender,move,player,foe,field,embed):
+    # Basic damage calculation
+    base_damage = 75
+    movetype="Armored"
+    catboost=await get_damage_multiplier(attacker, defender,movetype)
+    damage= await dmg(attacker, defender, base_damage, move, field,embed,catboost)
+    defender.health -= damage
+    embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
+    await flinch(attacker,defender,30,embed)
+
+async def charge(attacker,defender,move,player,foe,field,embed):
+    # Basic damage calculation
+    base_damage = 50
+    movetype="Giant"
+    catboost=await get_damage_multiplier(attacker, defender,movetype)
+    damage= await dmg(attacker, defender, base_damage, move, field,embed,catboost)
+    defender.health -= damage
+    embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
+    await defensechange(attacker,attacker,50,0.5,embed,defender)
+        
 async def howl(attacker,defender,move,player,foe,field,embed):
     movetype="Predator"
     embed.add_field(name=f"{attacker.name} used {move}!", value=f"Howl was heard from miles away!", inline=False)
     await attackchange(attacker,attacker,100,0.5,embed,defender)
+
+async def dash(attacker,defender,move,player,foe,field,embed):
+    # Basic damage calculation
+    base_damage = 20
+    movetype="Armored"
+    catboost=await get_damage_multiplier(attacker, defender,movetype)
+    damage= await dmg(attacker, defender, base_damage, move, field,embed,catboost)
+    defender.health -= damage
+    embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
+    await speedchange(attacker,attacker,100,0.5,embed,defender)
+
+async def leap(attacker,defender,move,player,foe,field,embed):
+    # Basic damage calculation
+    base_damage = 20
+    movetype="Arboreal"
+    catboost=await get_damage_multiplier(attacker, defender,movetype)
+    damage= await dmg(attacker, defender, base_damage, move, field,embed,catboost)
+    defender.health -= damage
+    embed.add_field(name=f"{attacker.name} used {move}!", value=f"It dealt {damage} damage!", inline=False)
+    await speedchange(attacker,attacker,100,0.5,embed,defender)
     
 #Damage Calculation        
 async def dmg(attacker, defender, base_damage, move, field,embed,catboost=1,crit=5):
@@ -292,6 +351,12 @@ async def sleep(attacker,defender,percentage,embed):
         defender.status.append("Sleep")
         embed.add_field(name="Sleep!",value=f"{defender.name} fell asleep.",inline=False)
 
+async def flinch(attacker,defender,percentage,embed):
+    chance=random.randint(1,100)
+    if chance<=percentage and "Flinch" not in defender.status:
+        defender.status.append("Flich")
+        embed.add_field(name="Flinched!",value=f"{defender.name} was flinced.",inline=False)
+
 async def drown(attacker,defender,percentage,embed):
     chance=random.randint(1,100)
     if chance<=percentage and "Drown" not in defender.status:
@@ -350,9 +415,34 @@ async def defensechange(victim,attacker,percentage,boost,embed,defender):
             embed.add_field(name="Defense nerfed!",value=f"{victim.name}'s defense fell.",inline=False)
         elif boost==-1:
             victim.defenseboost-=0.5
-            embed.add_field(name="Defense nerfed!",value=f"{victim.name}'s defensek heavily fell.",inline=False)
+            embed.add_field(name="Defense nerfed!",value=f"{victim.name}'s defense heavily fell.",inline=False)
         if victim.defenseboost<0.25:
             victim.defenseboost=0.25
     elif chance<=percentage and victim.defenseboost==0.25 and boost<0:
         embed.add_field(name="Defense nerf attempt!",value=f"{victim.name}'s defense won't go any lower.",inline=False)
+
+async def speedchange(victim,attacker,percentage,boost,embed,defender):
+    chance=random.randint(1,100)
+    if chance<=percentage and victim.speedboost!=3 and boost>0:
+        if boost==0.5:
+            victim.speedboost+=0.5
+            embed.add_field(name="Speed boosted!",value=f"{victim.name}'s speed rose.",inline=False)
+        elif boost==1:
+            victim.speedboost+=1
+            embed.add_field(name="Speed boosted!",value=f"{victim.name}'s speed sharply rose.",inline=False)
+        if victim.speedboost>3:
+            victim.speedboost=3
+    elif chance<=percentage and victim.speedboost==3 and boost>0:
+        embed.add_field(name="Speed boost attempt!",value=f"{victim.name}'s speed won't go any higher.",inline=False)
+    elif chance<=percentage and victim.speedboost!=3 and boost<0:
+        if boost==-0.25:
+            victim.speedboost-=0.5
+            embed.add_field(name="Speed nerfed!",value=f"{victim.name}'s speed fell.",inline=False)
+        elif boost==-1:
+            victim.speedboost-=0.5
+            embed.add_field(name="Speed nerfed!",value=f"{victim.name}'s speedk heavily fell.",inline=False)
+        if victim.speedboost<0.25:
+            victim.speedboost=0.25
+    elif chance<=percentage and victim.speedboost==0.25 and boost<0:
+        embed.add_field(name="Speed nerf attempt!",value=f"{victim.name}'s speed won't go any lower.",inline=False)
     

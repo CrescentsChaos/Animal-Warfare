@@ -295,15 +295,20 @@ class BattleView(View):
 
         for move in ally.moves:
             self.add_item(self.create_move_button(move))
-
+            
+            
     def create_move_button(self, move_name):
         button = Button(label=move_name, style=discord.ButtonStyle.green)
         async def callback(interaction: discord.Interaction):
             if self.battle_over:
                 await interaction.response.send_message("⚠️ Battle already ended.", ephemeral=True)
                 return
+            if interaction.user.id != self.player.id:
+                await interaction.response.send_message("⚠️ You cannot interact with this!", ephemeral=True)
+                return
             # Acknowledge the interaction to prevent the "Interaction Failed" error
             await interaction.response.defer()
+            
             # The message edit will now be handled inside process_turn after deferring
             await self.process_turn(interaction, move_name)
 
@@ -314,7 +319,7 @@ class BattleView(View):
         # Disable buttons immediately
         for item in self.children:
             item.disabled = True
-
+        await interaction.message.edit(view=None)
         try:
             # Check if the battle is already over
             if self.battle_over:
@@ -330,7 +335,7 @@ class BattleView(View):
                 description=f"",
                 color=discord.Color.red()
             )
-            embed.add_field(name="Weather",value=f"{weather.title()}",inline=False)
+            embed.add_field(name="Weather",value=f"{weather_emojis[weather]} {weather.title()}",inline=False)
             await environmenteff(self.ally,self.foe,field,embed)
             foe_move=random.choice(self.foe.moves)
             # Determine turn order based on speed
@@ -352,7 +357,9 @@ class BattleView(View):
                     
             # Update embed fields
             embed.add_field(name=f"{self.ally.name}", value=f"HP: {str(max(0, self.ally.health))}/{self.ally.maxhealth}",inline=False)
+            embed.add_field(name=f"HP Bar:", value=f"{await hpbar(self.ally)}",inline=False)
             embed.add_field(name=f"{self.foe.name}", value=f"HP: {str(max(0, self.foe.health))}/{self.foe.maxhealth}",inline=False)
+            embed.add_field(name=f"HP Bar:", value=f"{await hpbar(self.foe)}",inline=False)
             embed.set_image(url=self.spawned_animal.sprite)
             embed.set_footer(text=f"Biome: {self.player.location}")
             # Check for battle end
@@ -363,7 +370,7 @@ class BattleView(View):
             if not self.battle_over:
                 for item in self.children:
                     item.disabled = False
-            await interaction.message.edit(embed=embed, view=self)  
+            await interaction.followup.send(embed=embed, view=self)  
             
         except Exception as e:
             print(f"Error during battle turn: {e}")
@@ -383,7 +390,7 @@ class BattleView(View):
                 color=discord.Color.green()
             )
             embed.set_image(url=self.foe.sprite)
-            await self.message.edit(embed=embed, view=new_view)
+            await self.message.channel.send(embed=embed, view=new_view)
         else:
             embed = discord.Embed(
                 title=f"💀 Defeated!",
@@ -391,18 +398,25 @@ class BattleView(View):
                 color=discord.Color.dark_red()
             )
             embed.set_image(url=self.foe.sprite)
-            await self.message.edit(embed=embed, view=None)
+            await self.message.channel.send(embed=embed, view=None)
 
 class EncounterView(View):
     def __init__(self, spawned_animal, player):
         super().__init__(timeout=60)
         self.spawned_animal = spawned_animal
         self.player = player
-
+     
+            
     @button(label="⚔️ Battle", style=discord.ButtonStyle.danger)
     async def fight_button(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.player.id:
+            await interaction.response.send_message("⚠️ You cannot interact with this!", ephemeral=True)
+            return
         await interaction.response.defer()  # acknowledge interaction
-
+        
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=None)
         ally = await convert_allyanimal(self.player.id)
         foe = await convert_wildanimal(self.spawned_animal)
         weather=await get_weather(self.player.location)
@@ -412,21 +426,30 @@ class EncounterView(View):
             description=f"**{ally.name}** vs **{foe.name}**",
             color=discord.Color.orange()
         )  # get the message object
-        battle_embed.add_field(name="Weather",value=f"{weather.title()}",inline=False)
+        battle_embed.add_field(name="Weather",value=f"{weather_emojis[weather]} {weather.title()}",inline=False)
         battle_embed.add_field(name=f"{ally.name}", value=f"HP: {str(max(0, ally.health))}/{ally.maxhealth}",inline=False)
+        battle_embed.add_field(name=f"HP Bar:", value=f"{await hpbar(ally)}",inline=False)
         battle_embed.add_field(name=f"{foe.name}", value=f"HP: {str(max(0, foe.health))}/{foe.maxhealth}",inline=False)
+        battle_embed.add_field(name=f"HP Bar:", value=f"{await hpbar(foe)}",inline=False)
         battle_embed.set_image(url=self.spawned_animal.sprite)
         battle_embed.set_footer(text=f"Biome: {self.player.location}")
         # Pass ONLY the message to BattleView
         battle_view = BattleView(self.player, ally, foe, interaction.message,self.spawned_animal)
-        await interaction.edit_original_response(embed=battle_embed, view=battle_view)
+        await interaction.followup.send(embed=battle_embed, view=battle_view)
 
     @button(label="🏃 Run", style=discord.ButtonStyle.gray)
     async def run_button(self, interaction: discord.Interaction, button: Button):
-        await interaction.response.edit_message(
-            content="🏃 You escaped safely!",embed=None,
-            view=None
-        )
+        if interaction.user.id != self.player.id:
+            await interaction.response.send_message("⚠️ You cannot interact with this!", ephemeral=True)
+            return
+        await interaction.response.defer()
+        await interaction.message.edit(view=None)
+        embed = discord.Embed(
+            title="🏃 Escape!",
+            description=f"You escaped from {self.spawned_animal.name}.",
+            color=discord.Color.orange())
+        embed.set_image(url=self.spawned_animal.sprite)
+        await interaction.followup.send(embed=embed)
 
 
 class CaptureLootView(View):
@@ -437,19 +460,30 @@ class CaptureLootView(View):
 
     @button(label="🎯 Capture", style=discord.ButtonStyle.green)
     async def capture_button(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.player.id:
+            await interaction.response.send_message("⚠️ You cannot interact with this!", ephemeral=True)
+            return
         await interaction.response.defer()
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=None)
         await save_capture(self.player, self.spawned_animal)  # <-- DB save function
-        await interaction.edit_original_response(
-            content=f"🎉 You captured **{self.spawned_animal.name}**!",embed=None,
-            view=None
+        await interaction.followup.send(
+            content=f"🎉 You captured **{self.spawned_animal.name}**!"
         )
 
     @button(label="💰 Loot", style=discord.ButtonStyle.blurple)
     async def loot_button(self, interaction: discord.Interaction, button: Button):
+        if interaction.user.id != self.player.id:
+            await interaction.response.send_message("⚠️ You cannot interact with this!", ephemeral=True)
+            return
         await interaction.response.defer()
+        for item in self.children:
+            item.disabled = True
+        await interaction.message.edit(view=None)
         loot_item = random.choice(self.spawned_animal.drop.split(',')) # <-- generate item(s)
         await add_to_inventory(self.player, loot_item)   # <-- save in DB
-        await interaction.edit_original_response(
+        await interaction.followup.send(
             content=f"💰 You looted **{loot_item}** from {self.spawned_animal.name}!",embed=None,
             view=None
         )

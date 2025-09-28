@@ -8,6 +8,16 @@ async def get_weather(biome: str) -> str:
         
     # return the "current" weather value for the biome you asked for
     return data[biome]["current"]
+async def hpbar(attacker):
+    healthbar = "<:HP:1107296292243255356>" + "<:GREY:1107331848360689747>" * 10 + "<:END:1107296362988580907>"
+    if True:
+        if 0.6 < (attacker.health / attacker.maxhealth) <= 1:
+            healthbar = "<:health:1107296292243255356>" + "<:GREEN:1107296335780139113>" * int((attacker.health / attacker.maxhealth) * 10) + "<:GREY:1107331848360689747>" * (10 - int((attacker.health / attacker.maxhealth) * 10)) + "<:END:1107296362988580907>"
+        elif 0.3 < (attacker.health / attacker.maxhealth) <= 0.6:
+            healthbar = "<:health:1107296292243255356>" + "<:YELLOW:1107331825929556111>" * int((attacker.health / attacker.maxhealth) * 10) + "<:GREY:1107331848360689747>" * (10 - int((attacker.health / attacker.maxhealth) * 10)) + "<:END:1107296362988580907>"
+        elif 0 < (attacker.health / attacker.maxhealth) <= 0.3:
+            healthbar = "<:health:1107296292243255356>" + "<:RED:1107331787480379543>" * int((attacker.health / attacker.maxhealth) * 10) + "<:GREY:1107331848360689747>" * (10 - int((attacker.health / attacker.maxhealth) * 10)) + "<:END:1107296362988580907>"
+    return healthbar
 
 def select_animal_by_rarity(animals):
     """Selects a single animal from a list based on its rarity."""
@@ -402,10 +412,15 @@ async def attack(attacker,defender,move,player,foe,field,embed):
         "Piercing Beak": piercingbeak,
         "Venomous Fang": venomousfang,
         "Fin Slash": finslash,
-        "Predatory Surge": predatorysurge
+        "Predatory Surge": predatorysurge,
+        "Dash" : dash,
+        "Leap" : leap,
+        "Dig" : dig
     }
-    if move in attacks:
+    if move in attacks and "Flinch" not in attacker.status:
         await attacks[move](attacker,defender,move,player,foe,field,embed)
+    if "Flinch" in attacker.status:
+        attacker.status.remove("Flinch")
         
       
     
